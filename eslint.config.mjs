@@ -9,8 +9,16 @@ const compat = new FlatCompat({
   baseDirectory: __dirname,
 });
 
+const eslintRules = {
+  files: ["src/**/*.{js,jsx,ts,tsx}"],
+  ignores: [],
+  rules: {},
+};
+
 const eslintConfig = [
+  eslintRules,
   ...compat.extends("next/core-web-vitals", "next/typescript"),
+  ...compat.extends("plugin:prettier/recommended"),
 ];
 
 export default eslintConfig;
