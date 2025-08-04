@@ -38,7 +38,7 @@ function EventLocation() {
       color: "#ffffff",
       border: "none",
       borderRadius: "8px",
-      backgroundColor: "rgb(25, 25, 25)",
+      backgroundColor: "rgb(20, 20, 30)",
       padding: "8px",
     }),
     option: (provided: object, state: any) => ({

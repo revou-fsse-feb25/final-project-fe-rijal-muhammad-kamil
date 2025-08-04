@@ -6,7 +6,7 @@ import { ArrowRight } from "lucide-react";
 
 function EventSearch(): React.ReactElement {
   return (
-    <div className="w-xl lg:w-[70vw] 2xl:w-[60vw] bg-white/5 rounded-lg lg:rounded-full backdrop-blur-xl py-4 px-8 lg:py-2 lg:px-4">
+    <div className="w-xl lg:w-[70vw] 2xl:w-[60vw] bg-[rgba(20,20,30,0.5)] rounded-lg lg:rounded-full backdrop-blur-xl py-4 px-8 lg:py-2 lg:px-4">
       <ul className="flex flex-col lg:flex-row lg:items-center gap-y-4 gap-x-2 text-center">
         <li className="flex-1/2">
           <EventSearchBar />

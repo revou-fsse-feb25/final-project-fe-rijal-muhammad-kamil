@@ -5,6 +5,7 @@ import { HeaderMainNavbar, HeaderSecondaryNavbar, HeaderThirdNavbar } from "@/co
 import { HeaderLogo } from "@/container/logo";
 import Image from "next/image";
 import EventSearch from "@/container/event-search/event-search";
+import MainBanner from "@/container/banner";
 
 const inter = Inter({
   variable: "--font-primary",
@@ -27,7 +28,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="en" className="text-base">
       <body className={`${inter.variable} ${caveat.variable} antialiased font-(family-name:--font-primary) tracking-normal leading-normal text-white bg-(--background-color)`}>
-        <section id="hero" className="h-[70vh] flex flex-col relative bg-[rgba(10,10,20,0.7)] px-8 sm:px-16 lg:px-32 2xl:px-64">
+        <section id="hero" className="min-h-[70vh] flex flex-col relative bg-[rgba(10,10,20,0.7)] px-8 sm:px-16 lg:px-32 2xl:px-64">
           <Image src="/hero-image-1920.jpeg" alt="Hero image" fill className="z-[-50]"></Image>
           <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_center,rgba(10,10,20,0)_50%,rgba(10,10,20,0.7)_100%)]"></div>
           <header>
@@ -42,7 +43,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
               </div>
             </div>
           </header>
-          <div className="flex flex-col items-center">
+          <div id="hero-1" className="flex flex-col items-center">
             <div className="w-xl my-14">
               <h2 className="font-(family-name:--font-secondary) text-3xl text-orange-500 text-center mb-4">Undercover New Moments</h2>
               <h1 className="text-5xl font-bold text-center mb-4">DISCOVER EVENTS & EXPERIENCES</h1>
@@ -53,6 +54,11 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             </div>
           </div>
         </section>
+        <main className="h-[100vh] px-8 sm:px-16 lg:px-32 2xl:px-64 py-16">
+          <section id="banner">
+            <MainBanner />
+          </section>
+        </main>
         {children}
       </body>
     </html>

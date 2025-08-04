@@ -5,3 +5,48 @@
   --color-surface: rgba(255, 255, 255, 0.3);
   --color-surface-variant: rgba(255, 255, 255, 0.1);
 }
+
+.swiper-pagination-bullet {
+  background-color: #ffffff !important;
+  transition: all 0.700s ease-in;
+}
+
+.swiper-pagination-bullet-active {
+  width: 1.5rem !important;
+  border-radius: 8px !important;
+}
+
+.swiper-button-prev {
+  width: 2.5rem !important;
+  height: 2.5rem !important;
+  left: 3rem !important;
+  border-radius: 50%;
+  background-color: #ffffff;
+  opacity: 0;
+  transition: all 0.700s ease-in;
+}
+
+.swiper-button-next {
+  width: 2.5rem !important;
+  height: 2.5rem !important;
+  right: 3rem !important;
+  border-radius: 50%;
+  background-color: #ffffff;
+  opacity: 0;
+  transition: all 0.7100s ease-in;
+}
+
+.swiper-button-prev::after, .swiper-button-next::after {
+  font-size: 1rem !important;
+  color: #000000;
+}
+
+.swiper:hover .swiper-button-prev {
+  left: 1rem !important;
+  opacity: 1;
+}
+
+.swiper:hover .swiper-button-next {
+  right: 1rem !important;
+  opacity: 1;
+}
