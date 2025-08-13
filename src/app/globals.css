@@ -7,6 +7,7 @@
   --text-color: #ffffff;
   --text-color-variant-1: #e5e7eb;
   --text-color-variant-2: #000000;
+
   --background-color:	rgb(10, 10, 20);
   --background-color-transparant: rgba(10,10,20,0.5);
 
@@ -17,7 +18,7 @@
 
 .swiper-pagination-bullet {
   background-color: #ffffff !important;
-  transition: all 0.300s ease-in;
+  transition: all 0.150s ease-in;
 }
 
 .swiper-pagination-bullet-active {
@@ -32,7 +33,7 @@
   border-radius: 50%;
   background-color: #ffffff;
   opacity: 0;
-  transition: all 0.300s ease-in;
+  transition: all 0.150s ease-in;
 }
 
 .swiper-button-next {
@@ -42,7 +43,7 @@
   border-radius: 50%;
   background-color: #ffffff;
   opacity: 0;
-  transition: all 0.300s ease-in;
+  transition: all 0.150s ease-in;
 }
 
 .swiper-button-prev::after, .swiper-button-next::after {

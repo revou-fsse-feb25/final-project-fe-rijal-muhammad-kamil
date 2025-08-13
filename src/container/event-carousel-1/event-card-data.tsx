@@ -12,7 +12,7 @@ import { Navigation, Mousewheel, Pagination } from "swiper/modules";
 const swiper = {
   modules: [Navigation, Pagination, Mousewheel],
   options: {
-    speed: 700,
+    speed: 300,
     loop: false,
     effect: "slide",
     pagination: { clickable: true },
@@ -35,18 +35,18 @@ const cardStyle = {
   cardImageStyle: "object-cover rounded-2xl",
   cardCategoryWrapperStyle: "flex items-center gap-1 absolute -bottom-4 left-4 rounded-full bg-orange-600 px-4 py-2",
   cardCategoryStyle: "text-xs font-semibold",
-  cardDetailWrapperStyle: "h-full flex flex-col justify-between px-4",
+  cardDetailWrapperStyle: "h-full flex flex-col gap-4 px-4",
   cardDateTimeWrapperStyle: "flex gap-2 mb-2",
   cardDateWrapperStyle: "flex items-center gap-1",
   cardDateStyle: "text-xs font-semibold text-orange-600",
   cardTimeWrapperStyle: "flex items-center gap-1",
   cardTimeStyle: "text-xs font-semibold text-orange-600",
-  cardTitleStyle: "font-bold",
   cardLocationWrapperStyle: "flex items-center gap-1",
-  cardLocationStyle: "text-xs font-semibold text-gray-300",
+  cardLocationStyle: "text-xs font-semibold text-orange-600",
+  cardTitleStyle: "font-bold",
 };
 
-function EventCardData1() {
+function EventCardData() {
   const {
     data: cardDatas = [],
     isLoading,
@@ -60,13 +60,13 @@ function EventCardData1() {
       const events = await fetchEvent<EventCardApiResponse[]>({ endpoint: "events" });
       return events.map((event: EventCardApiResponse) => ({
         id: event.id,
-        cardTitleLabel: event.title,
+        cardImageSrc: event.image,
+        cardImageAlt: "image",
         cardCategoryLabel: event.category,
         cardDateLabel: event.date,
         cardTimeLabel: event.time,
         cardLocationLabel: event.location,
-        cardImageSrc: event.image,
-        cardImageAlt: "image",
+        cardTitleLabel: event.title,
       }));
     },
   });
@@ -101,4 +101,4 @@ function EventCardData1() {
   );
 }
 
-export default EventCardData1;
+export default EventCardData;

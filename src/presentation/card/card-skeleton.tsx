@@ -8,7 +8,7 @@ function CardSkeleton() {
             <span className="w-16 h-4 rounded-sm bg-gray-300 animate-pulse" />
           </div>
         </div>
-        <div className="h-full flex flex-col justify-between px-4">
+        <div className="h-full flex flex-col gap-4 px-4">
           <div>
             <div className="flex gap-2 mb-2">
               <div className="flex items-center gap-1">
@@ -20,12 +20,12 @@ function CardSkeleton() {
                 <span className="w-16 h-4 rounded-sm bg-gray-300 animate-pulse" />
               </div>
             </div>
-            <h4 className="w-3/4 h-6 rounded-sm bg-gray-300 animate-pulse" />
+            <div className="flex items-center gap-1">
+              <div className="w-4 h-4 rounded-sm bg-gray-300 animate-pulse" />
+              <span className="w-24 h-4 rounded-sm bg-gray-300 animate-pulse" />
+            </div>
           </div>
-          <div className="flex items-center gap-1">
-            <div className="w-4 h-4 rounded-sm bg-gray-300 animate-pulse" />
-            <span className="w-24 h-4 rounded-sm bg-gray-300 animate-pulse" />
-          </div>
+          <h4 className="w-3/4 h-6 rounded-sm bg-gray-300 animate-pulse" />
         </div>
       </div>
     </div>

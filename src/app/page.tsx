@@ -1,5 +1,5 @@
 import MainBanner from "@/container/banner";
-import CardContainer from "@/container/event-card/event-card-container";
+import EventCarousel1 from "@/container/event-carousel-1/event-card-container";
 
 export default function Main() {
   return (
@@ -13,7 +13,7 @@ export default function Main() {
           <h1 className="text-4xl font-bold text-center mb-10">Popular Events</h1>
         </div>
         <div>
-          <CardContainer />
+          <EventCarousel1 />
         </div>
       </section>
     </>

@@ -4,8 +4,8 @@ interface CardData {
   cardCategoryLabel: string;
   cardDateLabel: string;
   cardTimeLabel: string;
-  cardTitleLabel: string;
   cardLocationLabel: string;
+  cardTitleLabel: string;
 }
 
 interface CardStyle {
@@ -13,17 +13,17 @@ interface CardStyle {
   cardWrapperStyle?: string;
   cardImageWrapperStyle?: string;
   cardImageStyle?: string;
-  cardLocationWrapperStyle?: string;
-  cardLocationStyle?: string;
+  cardCategoryWrapperStyle?: string;
+  cardCategoryStyle?: string;
   cardDetailWrapperStyle?: string;
   cardDateTimeWrapperStyle?: string;
   cardDateWrapperStyle?: string;
   cardDateStyle?: string;
   cardTimeWrapperStyle?: string;
   cardTimeStyle?: string;
+  cardLocationWrapperStyle?: string;
+  cardLocationStyle?: string;
   cardTitleStyle?: string;
-  cardCategoryWrapperStyle?: string;
-  cardCategoryStyle?: string;
 }
 
 export interface CardProps {

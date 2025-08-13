@@ -25,12 +25,12 @@ function Card({ cardDatas, cardStyle }: CardProps) {
                 <span className={cardStyle.cardTimeStyle}>{cardDatas.cardTimeLabel}</span>
               </div>
             </div>
-            <h4 className={cardStyle.cardTitleStyle}>{cardDatas.cardTitleLabel}</h4>
+            <div className={cardStyle.cardLocationWrapperStyle}>
+              <MapPin size={16} color="#f54a00" />
+              <span className={cardStyle.cardLocationStyle}>{cardDatas.cardLocationLabel}</span>
+            </div>
           </div>
-          <div className={cardStyle.cardLocationWrapperStyle}>
-            <MapPin size={16} color="#f54a00" />
-            <span className={cardStyle.cardLocationStyle}>{cardDatas.cardLocationLabel}</span>
-          </div>
+          <h4 className={cardStyle.cardTitleStyle}>{cardDatas.cardTitleLabel}</h4>
         </div>
       </div>
     </div>

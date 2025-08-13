@@ -60,12 +60,12 @@ const customStyle = {
   menuList: () => ({}),
 };
 
-function EventCategoryLocal1() {
+function EventLocation() {
   return (
     <div className="flex items-center">
-      <Select options={options} placeholder="Category" className="w-full" styles={customStyle} />
+      <Select options={options} placeholder="Location" className="w-full" styles={customStyle} />
     </div>
   );
 }
 
-export default EventCategoryLocal1;
+export default EventLocation;

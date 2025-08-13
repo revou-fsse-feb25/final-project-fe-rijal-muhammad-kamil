@@ -60,12 +60,12 @@ const customStyle = {
   menuList: () => ({}),
 };
 
-function EventDateLocal1() {
+function EventDate() {
   return (
     <div className="flex items-center">
-      <Select options={options} placeholder="date" className="w-full" styles={customStyle} />
+      <Select options={options} placeholder="Date" className="w-full" styles={customStyle} />
     </div>
   );
 }
 
-export default EventDateLocal1;
+export default EventDate;

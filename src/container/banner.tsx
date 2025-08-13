@@ -78,7 +78,7 @@ const bannerSwiper = {
       delay: 5000,
       disableOnInteraction: false,
     },
-    speed: 700,
+    speed: 300,
     loop: true,
     effect: "slide",
     pagination: { clickable: true },

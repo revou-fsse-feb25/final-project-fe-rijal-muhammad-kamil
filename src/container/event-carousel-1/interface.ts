@@ -5,6 +5,6 @@ type EventCardApiResponse = {
   category: string;
   date: string;
   time: string;
-  title: string;
   location: string;
+  title: string;
 };
