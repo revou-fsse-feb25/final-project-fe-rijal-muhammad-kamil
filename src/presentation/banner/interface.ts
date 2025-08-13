@@ -13,19 +13,13 @@ export interface BannerStyle {
   swiperSlideStyle?: string;
   linkStyle?: string;
   imageStyle?: string;
-  //   dotWrapperStyle?: string;
-  //   dotStyle?: string | ((isActive: boolean) => string);
-  //   leftArrowStyle?: string;
-  //   rightArrowStyle?: string;
 }
 
-// Konfigurasi Swiper
 export interface BannerSwiper {
   modules?: SwiperModule[];
   options?: SwiperOptions;
 }
 
-// Props untuk komponen <Banner />
 export interface BannerProps {
   bannerDatas: BannerData[];
   bannerStyle: BannerStyle;

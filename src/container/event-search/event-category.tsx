@@ -13,45 +13,45 @@ function EventCategory() {
   ];
 
   const customStyle = {
-    control: (provided: object, state: any) => ({
+    control: (provided: object) => ({
       ...provided,
-      color: state.isSelected ? "#ffffff" : "#ffffff",
+      color: "var(--text-color)",
       border: "none",
-      borderRadius: "8px",
+      borderRadius: "0.5rem",
       backgroundColor: "transparant",
-      boxShadow: state.isFocused ? "none" : "none",
+      boxShadow: "none",
     }),
-    singleValue: (provided: object, state: any) => ({
+    singleValue: (provided: object) => ({
       ...provided,
-      color: state.isSelected ? "none" : "#ffffff",
+      color: "var(--text-color)",
     }),
     placeholder: (provided: object) => ({
       ...provided,
-      color: "#ffffff",
+      color: "var(--text-color)",
     }),
     input: (provided: object) => ({
       ...provided,
-      color: "#ffffff",
+      color: "var(--text-color)",
     }),
     menu: (provided: object) => ({
       ...provided,
-      color: "#ffffff",
       border: "none",
-      borderRadius: "8px",
-      backgroundColor: "rgb(20, 20, 30)",
-      padding: "8px",
+      borderRadius: "0.5rem",
+      backgroundColor: "var(--color-surface-1)",
+      padding: "0.5rem",
     }),
     option: (provided: object, state: any) => ({
       ...provided,
-      color: state.isSelected ? "#000000" : "",
+      fontFamily: "var(--font-primary)",
+      fontSize: "1rem",
+      color: state.isSelected ? "var(--text-color-variant-2)" : state.isFocused ? "var(--text-color-variant-2)" : "",
       border: "none",
-      borderRadius: "8px",
-      backgroundColor: state.isSelected ? "#ffffff" : "",
+      borderRadius: "0.5rem",
+      backgroundColor: state.isSelected ? "var(--text-color)" : state.isFocused ? "var(--text-color)" : "var(--color-surface-1)",
       cursor: "pointer",
       transition: "all 150ms ease-in",
-      "&:hover": {
-        color: "#000000",
-        backgroundColor: "#ffffff",
+      "&:active": {
+        backgroundColor: "var(--text-color-variant-1)",
       },
     }),
     menuList: () => ({}),
@@ -59,7 +59,7 @@ function EventCategory() {
 
   return (
     <div className="flex items-center">
-      <Layers color="#ff6900" />
+      <Layers color="#f54a00" />
       <Select options={options} placeholder="Event Category" className="w-full" styles={customStyle} />
     </div>
   );
