@@ -3,8 +3,7 @@
 import EventCardData from "./event-card-data";
 import EventSearchContainer from "./event-search/event-search-container";
 
-function EventCarousel1
-() {
+function EventCarousel1() {
   return (
     <div className="flex flex-col">
       <EventSearchContainer />
@@ -13,5 +12,4 @@ function EventCarousel1
   );
 }
 
-export default EventCarousel1
-;
+export default EventCarousel1;

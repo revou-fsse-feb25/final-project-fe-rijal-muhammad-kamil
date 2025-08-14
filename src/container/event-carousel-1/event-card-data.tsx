@@ -5,7 +5,7 @@ import { fetchEvent, HttpError } from "@/service/event-api";
 import { useEffect } from "react";
 import ErrorPopUp from "@/presentation/pop-up/error-pop-up";
 import CardSkeleton from "@/presentation/card/card-skeleton";
-import Card from "@/presentation/card/card";
+import { FirstCard } from "@/presentation/card/card";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Mousewheel, Pagination } from "swiper/modules";
 
@@ -93,7 +93,7 @@ function EventCardData() {
             ))
           : cardDatas.map((cardData) => (
               <SwiperSlide key={cardData.id} style={{ width: "16rem" }}>
-                <Card cardDatas={cardData} cardStyle={cardStyle} />
+                <FirstCard cardDatas={cardData} cardStyle={cardStyle} />
               </SwiperSlide>
             ))}
       </Swiper>

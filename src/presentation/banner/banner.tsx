@@ -1,9 +1,9 @@
 import { Swiper, SwiperSlide } from "swiper/react";
 import Link from "next/link";
 import Image from "next/image";
-import { BannerProps } from "./interface";
+import { FirstBannerProps, SecondaryBannerProps } from "./interface";
 
-function Banner({ bannerDatas, bannerStyle, bannerSwiper }: BannerProps): React.ReactElement {
+function FirstBanner({ bannerDatas, bannerStyle, bannerSwiper }: FirstBannerProps): React.ReactElement {
   return (
     <Swiper modules={bannerSwiper.modules} {...bannerSwiper.options} className={bannerStyle.swiperStyle}>
       {bannerDatas.map((bannerData) => (
@@ -17,4 +17,12 @@ function Banner({ bannerDatas, bannerStyle, bannerSwiper }: BannerProps): React.
   );
 }
 
-export default Banner;
+function SecondaryBanner({ bannerDatas, bannerStyle }: SecondaryBannerProps) {
+  return (
+    <Link href={bannerDatas.linkHref} className={bannerStyle.linkStyle}>
+      <Image src={bannerDatas.imageSrc} alt={bannerDatas.imageAlt} fill className={bannerStyle.imageStyle}></Image>
+    </Link>
+  );
+}
+
+export { FirstBanner, SecondaryBanner };

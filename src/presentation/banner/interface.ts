@@ -1,27 +1,32 @@
 import { SwiperOptions } from "swiper/types";
 import { SwiperModule } from "swiper/types";
 
-export interface BannerData {
-  id: number;
+interface BannerData {
+  id?: number;
   linkHref: string;
   imageSrc: string;
   imageAlt: string;
 }
 
-export interface BannerStyle {
+interface BannerStyle {
   swiperStyle?: string;
   swiperSlideStyle?: string;
   linkStyle?: string;
   imageStyle?: string;
 }
 
-export interface BannerSwiper {
+interface BannerSwiper {
   modules?: SwiperModule[];
   options?: SwiperOptions;
 }
 
-export interface BannerProps {
+export interface FirstBannerProps {
   bannerDatas: BannerData[];
   bannerStyle: BannerStyle;
   bannerSwiper: BannerSwiper;
+}
+
+export interface SecondaryBannerProps {
+  bannerDatas: BannerData;
+  bannerStyle: BannerStyle;
 }

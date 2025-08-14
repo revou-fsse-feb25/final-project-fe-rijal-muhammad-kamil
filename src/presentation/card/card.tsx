@@ -1,8 +1,9 @@
 import Image from "next/image";
-import { CardProps } from "./interface";
+import { FirstCardProps, SecondaryCardProps } from "./interface";
 import { CalendarDays, Clock3, MapPin, Layers } from "lucide-react";
+import Link from "next/link";
 
-function Card({ cardDatas, cardStyle }: CardProps) {
+function FirstCard({ cardDatas, cardStyle }: FirstCardProps) {
   return (
     <div className={cardStyle.cardContainerStyle}>
       <div className={cardStyle.cardWrapperStyle}>
@@ -37,4 +38,12 @@ function Card({ cardDatas, cardStyle }: CardProps) {
   );
 }
 
-export default Card;
+function SecondaryCard({ cardDatas, cardStyle }: SecondaryCardProps) {
+  return (
+    <Link href={cardDatas.cardLinkHref} className={cardStyle.cardLinkStyle}>
+      <Image src={cardDatas.cardImageSrc} alt={cardDatas.cardImageAlt} fill className={cardStyle.cardImageStyle}></Image>
+    </Link>
+  );
+}
+
+export { FirstCard, SecondaryCard };

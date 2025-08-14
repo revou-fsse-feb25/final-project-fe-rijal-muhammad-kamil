@@ -1,9 +1,10 @@
 "use client";
-import Banner from "@/presentation/banner/banner";
+
+import { FirstBanner, SecondaryBanner } from "@/presentation/banner/banner";
 import { Navigation, Pagination, Autoplay, EffectFade, Mousewheel } from "swiper/modules";
 import "swiper/swiper-bundle.css";
 
-const bannerDatas = [
+const bannerDatas1 = [
   {
     id: 1,
     linkHref: "/",
@@ -66,8 +67,9 @@ const bannerDatas = [
   },
 ];
 
-const bannerStyle = {
-  swiperStyle: "aspect-[3/1] rounded-2xl",
+const bannerStyle1 = {
+  swiperStyle: "w-full aspect-[3.5/1] rounded-2xl",
+  linkStyle: "block w-full h-full relative",
   imageStyle: "object-cover",
 };
 
@@ -94,8 +96,22 @@ const bannerSwiper = {
   },
 };
 
-const MainBanner = () => {
-  return <Banner bannerDatas={bannerDatas} bannerStyle={bannerStyle} bannerSwiper={bannerSwiper} />;
+function Banner1() {
+  return <FirstBanner bannerDatas={bannerDatas1} bannerStyle={bannerStyle1} bannerSwiper={bannerSwiper} />;
+}
+
+const bannerDatas2 = {
+  linkHref: "/",
+  imageSrc: "https://placehold.co/600x400/000000/FFFFFF/png",
+  imageAlt: "Banner",
 };
 
-export default MainBanner;
+function Banner2() {
+  const bannerStyle2 = {
+    linkStyle: "block w-full aspect-[6/1] relative",
+    imageStyle: "object-cover rounded-2xl",
+  };
+  return <SecondaryBanner bannerDatas={bannerDatas2} bannerStyle={bannerStyle2} />;
+}
+
+export { Banner1, Banner2 };

@@ -1,4 +1,5 @@
 interface CardData {
+  id: number;
   cardImageSrc: string;
   cardImageAlt: string;
   cardCategoryLabel: string;
@@ -24,9 +25,23 @@ interface CardStyle {
   cardLocationWrapperStyle?: string;
   cardLocationStyle?: string;
   cardTitleStyle?: string;
+  linkStyle?: string;
+  cardLinkStyle?: string;
 }
 
-export interface CardProps {
+interface CardDatas {
+  id: number;
+  cardLinkHref: string;
+  cardImageSrc: string;
+  cardImageAlt: string;
+}
+
+export interface FirstCardProps {
   cardDatas: CardData;
+  cardStyle: CardStyle;
+}
+
+export interface SecondaryCardProps {
+  cardDatas: CardDatas;
   cardStyle: CardStyle;
 }

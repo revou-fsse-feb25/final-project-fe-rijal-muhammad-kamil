@@ -55,7 +55,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
               </div>
             </div>
           </section>
-          <main className="h-[200vh] flex flex-col gap-16 px-8 sm:px-16 lg:px-32 2xl:px-64 py-16">{children}</main>
+          <main className="h-[200vh] flex flex-col gap-16 px-8 sm:px-16 lg:px-32 2xl:px-64 py-12">{children}</main>
         </QueryProviders>
       </body>
     </html>
