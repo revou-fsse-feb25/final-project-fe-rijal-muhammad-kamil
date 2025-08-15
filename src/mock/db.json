@@ -1,0 +1,184 @@
+{
+  "events": [
+    {
+      "id": 1,
+      "title": "Yoga Fest",
+      "category": "Sports",
+      "date": "2025-08-18",
+      "time": "07:00",
+      "location": "Bandung Hall",
+      "image": "https://placehold.co/600x400/000000/FFFFFF/png"
+    },
+    {
+      "id": 2,
+      "title": "Startup Talk",
+      "category": "Business",
+      "date": "2025-08-20",
+      "time": "10:00",
+      "location": "Jakarta Hub",
+      "image": "https://placehold.co/600x400/000000/FFFFFF/png"
+    },
+    {
+      "id": 3,
+      "title": "Jazz Night",
+      "category": "Music",
+      "date": "2025-08-25",
+      "time": "20:00",
+      "location": "Yogya Hall",
+      "image": "https://placehold.co/600x400/000000/FFFFFF/png"
+    },
+    {
+      "id": 4,
+      "title": "Tech Expo",
+      "category": "Technology",
+      "date": "2025-09-01",
+      "time": "09:00",
+      "location": "ICE BSD",
+      "image": "https://placehold.co/600x400/000000/FFFFFF/png"
+    },
+    {
+      "id": 5,
+      "title": "Food Fair",
+      "category": "Food",
+      "date": "2025-09-05",
+      "time": "11:00",
+      "location": "Surabaya Park",
+      "image": "https://placehold.co/600x400/000000/FFFFFF/png"
+    },
+    {
+      "id": 6,
+      "title": "Art Show",
+      "category": "Art",
+      "date": "2025-09-10",
+      "time": "15:00",
+      "location": "Bali Center",
+      "image": "https://placehold.co/600x400/000000/FFFFFF/png"
+    },
+    {
+      "id": 7,
+      "title": "Coding Camp",
+      "category": "Technology",
+      "date": "2025-09-15",
+      "time": "08:00",
+      "location": "Jakarta Hub",
+      "image": "https://placehold.co/600x400/000000/FFFFFF/png"
+    },
+    {
+      "id": 8,
+      "title": "Movie Night",
+      "category": "Entertainment",
+      "date": "2025-09-18",
+      "time": "19:00",
+      "location": "Bali Plaza",
+      "image": "https://placehold.co/600x400/000000/FFFFFF/png"
+    },
+    {
+      "id": 9,
+      "title": "Book Fair",
+      "category": "Education",
+      "date": "2025-09-22",
+      "time": "09:30",
+      "location": "Yogya Hall",
+      "image": "https://placehold.co/600x400/000000/FFFFFF/png"
+    },
+    {
+      "id": 10,
+      "title": "Rock Fest",
+      "category": "Music",
+      "date": "2025-09-28",
+      "time": "18:00",
+      "location": "Bandung Hall",
+      "image": "https://placehold.co/600x400/000000/FFFFFF/png"
+    },
+    {
+      "id": 11,
+      "title": "Startup Pitch",
+      "category": "Business",
+      "date": "2025-10-02",
+      "time": "13:00",
+      "location": "Jakarta Hub",
+      "image": "https://placehold.co/600x400/000000/FFFFFF/png"
+    },
+    {
+      "id": 12,
+      "title": "Marathon",
+      "category": "Sports",
+      "date": "2025-10-06",
+      "time": "06:00",
+      "location": "Bali Center",
+      "image": "https://placehold.co/600x400/000000/FFFFFF/png"
+    },
+    {
+      "id": 13,
+      "title": "Theatre",
+      "category": "Entertainment",
+      "date": "2025-10-10",
+      "time": "19:30",
+      "location": "Surabaya Hall",
+      "image": "https://placehold.co/600x400/000000/FFFFFF/png"
+    },
+    {
+      "id": 14,
+      "title": "Game Con",
+      "category": "Technology",
+      "date": "2025-10-15",
+      "time": "09:00",
+      "location": "Bandung Hall",
+      "image": "https://placehold.co/600x400/000000/FFFFFF/png"
+    },
+    {
+      "id": 15,
+      "title": "Coffee Fest",
+      "category": "Food",
+      "date": "2025-10-20",
+      "time": "14:00",
+      "location": "Yogya Park",
+      "image": "https://placehold.co/600x400/000000/FFFFFF/png"
+    },
+    {
+      "id": 16,
+      "title": "Batik Day",
+      "category": "Culture",
+      "date": "2025-10-25",
+      "time": "10:00",
+      "location": "Jakarta Hall",
+      "image": "https://placehold.co/600x400/000000/FFFFFF/png"
+    },
+    {
+      "id": 17,
+      "title": "Indie Fest",
+      "category": "Music",
+      "date": "2025-11-01",
+      "time": "17:00",
+      "location": "Bali Plaza",
+      "image": "https://placehold.co/600x400/000000/FFFFFF/png"
+    },
+    {
+      "id": 18,
+      "title": "Edu Expo",
+      "category": "Education",
+      "date": "2025-11-06",
+      "time": "09:00",
+      "location": "Surabaya Hall",
+      "image": "https://placehold.co/600x400/000000/FFFFFF/png"
+    },
+    {
+      "id": 19,
+      "title": "Dance Show",
+      "category": "Art",
+      "date": "2025-11-12",
+      "time": "18:30",
+      "location": "Jakarta Hub",
+      "image": "https://placehold.co/600x400/000000/FFFFFF/png"
+    },
+    {
+      "id": 20,
+      "title": "Music Jam",
+      "category": "Music",
+      "date": "2025-11-18",
+      "time": "20:00",
+      "location": "Bandung Hall",
+      "image": "https://placehold.co/600x400/000000/FFFFFF/png"
+    }
+  ]
+}

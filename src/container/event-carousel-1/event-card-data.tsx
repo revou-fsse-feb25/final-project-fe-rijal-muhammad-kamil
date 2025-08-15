@@ -57,14 +57,14 @@ function EventCardData() {
   } = useQuery({
     queryKey: ["events"],
     queryFn: async () => {
-      const events = await fetchEvent<EventCardApiResponse[]>({ endpoint: "events" });
+      const events = await fetchEvent<EventCardApiResponse[]>({ endpoint: "events?_expand=eventCategory" });
       return events.map((event: EventCardApiResponse) => ({
         id: event.id,
         cardImageSrc: event.image,
         cardImageAlt: "image",
-        cardCategoryLabel: event.category,
-        cardDateLabel: event.date,
-        cardTimeLabel: event.time,
+        cardCategoryLabel: event.eventCategory.name,
+        cardDateLabel: event.start_date,
+        cardTimeLabel: event.start_time,
         cardLocationLabel: event.location,
         cardTitleLabel: event.title,
       }));
