@@ -9,6 +9,42 @@ import { FirstCard } from "@/presentation/card/card";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Mousewheel, Pagination } from "swiper/modules";
 
+interface EventCardApiResponse {
+  event_id: number;
+  category_id: number;
+  organizer_id: number;
+  title: string;
+  description: string;
+  location: string;
+  image_url: string;
+  status: string;
+  is_deleted: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+interface EventCategoryApiResponse {
+  category_id: number;
+  name: string;
+  created_at: string;
+  updated_at: string;
+}
+
+interface EventPeriodApiResponse {
+  period_id: number;
+  event_id: number;
+  name: string;
+  period_sequence: number;
+  start_date: string;
+  end_date: string;
+  start_time: string;
+  end_time: string;
+  capacity: number;
+  status: string;
+  created_at: string;
+  updated_at: string;
+}
+
 const swiper = {
   modules: [Navigation, Pagination, Mousewheel],
   options: {
@@ -57,17 +93,25 @@ function EventCardData() {
   } = useQuery({
     queryKey: ["events"],
     queryFn: async () => {
-      const events = await fetchEvent<EventCardApiResponse[]>({ endpoint: "events?_expand=eventCategory" });
-      return events.map((event: EventCardApiResponse) => ({
-        id: event.id,
-        cardImageSrc: event.image,
-        cardImageAlt: "image",
-        cardCategoryLabel: event.eventCategory.name,
-        cardDateLabel: event.start_date,
-        cardTimeLabel: event.start_time,
-        cardLocationLabel: event.location,
-        cardTitleLabel: event.title,
-      }));
+      const events = await fetchEvent<EventCardApiResponse[]>({ endpoint: "events" });
+      const categories = await fetchEvent<EventCategoryApiResponse[]>({ endpoint: "eventCategories" });
+      const periods = await fetchEvent<EventPeriodApiResponse[]>({ endpoint: "eventPeriods" });
+
+      return events.map((event: EventCardApiResponse) => {
+        const category = categories.find((cat) => cat.category_id === event.category_id);
+        const period = periods.find((p) => p.event_id === event.event_id);
+
+        return {
+          id: event.event_id,
+          cardImageSrc: event.image_url,
+          cardImageAlt: "image",
+          cardCategoryLabel: category?.name || "Unknown",
+          cardDateLabel: period?.start_date || "TBD",
+          cardTimeLabel: period?.start_time || "TBD",
+          cardLocationLabel: event.location,
+          cardTitleLabel: event.title,
+        };
+      });
     },
   });
 

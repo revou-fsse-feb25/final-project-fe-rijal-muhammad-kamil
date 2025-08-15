@@ -6,7 +6,7 @@
     "dev": "next dev -p 30003",
     "build": "next build",
     "start": "next start",
-    "mock-api": "json-server --watch src/mock/mock-api.json",
+    "mock-api": "json-server --watch src/mock/seed-data.json",
     "lint": "next lint --fix"
   },
   "dependencies": {

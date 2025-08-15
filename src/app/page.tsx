@@ -26,8 +26,8 @@ export default function Main() {
 
       <section>
         <div className="w-full bg-orange-600 py-6">
-        <h2 className="font-(family-name:--font-secondary) font-bold text-3xl text-center mb-6">Top Event</h2>
-          <TopEvent/>
+          <h2 className="font-(family-name:--font-secondary) font-bold text-3xl text-center mb-6">Top Event</h2>
+          <TopEvent />
         </div>
       </section>
 
