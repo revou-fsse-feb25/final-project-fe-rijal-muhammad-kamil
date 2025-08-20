@@ -10,17 +10,26 @@
     "lint": "next lint --fix"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^7.0.0",
+    "@fortawesome/free-brands-svg-icons": "^7.0.0",
+    "@fortawesome/free-regular-svg-icons": "^7.0.0",
+    "@fortawesome/free-solid-svg-icons": "^7.0.0",
+    "@fortawesome/react-fontawesome": "^0.2.3",
+    "@tanstack/react-form": "^1.19.2",
     "@tanstack/react-query": "^5.84.2",
     "@tanstack/react-query-devtools": "^5.84.2",
     "axios": "^1.11.0",
     "lucide-react": "^0.525.0",
     "motion": "^12.23.9",
     "next": "15.4.3",
+    "next-auth": "^4.24.11",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-select": "^5.10.2",
+    "react-toastify": "^11.0.5",
     "sweetalert2": "^11.22.3",
-    "swiper": "^11.2.10"
+    "swiper": "^11.2.10",
+    "zod": "^4.0.17"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
