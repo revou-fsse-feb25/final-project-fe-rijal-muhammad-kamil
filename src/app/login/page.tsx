@@ -1,7 +1,8 @@
 "use client";
-import React from "react";
-import Image from "next/image";
+
+import { useState } from "react";
 import { useForm } from "@tanstack/react-form";
+import Image from "next/image";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Mail, MailOpen, Lock, LockOpen, LoaderCircle } from "lucide-react";
@@ -14,7 +15,8 @@ const mockUsers: { id: string; email: string; password: string; name: string }[]
 ];
 
 export default function LoginPage() {
-  const [isSuccess, setIsSuccess] = React.useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+
   const form = useForm({
     defaultValues: { email: "", password: "" },
     onSubmit: async ({ value }: any) => {
@@ -23,7 +25,7 @@ export default function LoginPage() {
           setTimeout(() => {
             const found = mockUsers.find((u) => u.email === value.email && u.password === value.password);
             resolve(found || null);
-          }, 4000);
+          }, 3000);
         });
 
         if (!user) {
@@ -44,7 +46,6 @@ export default function LoginPage() {
       <ToastContainer />
 
       <div className="min-h-screen grid grid-cols-1 lg:grid-cols-2">
-        {/* Left side */}
         <div className="flex flex-col justify-center items-center">
           <div className="relative w-md aspect-[1/1]">
             <Image src="/login image.svg" alt="Login image" fill className=" opacity-80" />
@@ -147,7 +148,7 @@ export default function LoginPage() {
                 {({ values, isSubmitting }) => {
                   const emailMeta = form.getFieldMeta("email");
                   const passwordMeta = form.getFieldMeta("password");
-                  const isFormValid = emailMeta?.isValid || passwordMeta?.isValid;
+                  const isFormValid = emailMeta?.isValid && passwordMeta?.isValid;
 
                   return (
                     <button type="submit" disabled={!isFormValid} className="w-full flex items-center justify-center gap-2 font-semibold rounded-lg bg-gradient-to-r from-orange-500 to-orange-600 disabled:opacity-50 disabled:cursor-not-allowed py-2 px-4 transition-opacity duration-200">

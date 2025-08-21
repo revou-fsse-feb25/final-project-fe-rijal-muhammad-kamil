@@ -4,18 +4,11 @@ import Image from "next/image";
 import { useForm } from "@tanstack/react-form";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { Mail, MailOpen, Lock, LockOpen, LoaderCircle, UserRoundPen, Phone, Calendar } from "lucide-react";
+import { Mail, LoaderCircle, UserRoundPen, Phone, Calendar, Lock } from "lucide-react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGoogle, faFacebook, faApple, faTiktok } from "@fortawesome/free-brands-svg-icons";
 
-const mockUsers: { id: string; email: string; password: string; name: string }[] = [
-  { id: "u_1", email: "user@example.com", password: "password123", name: "Sample User" },
-  { id: "u_2", email: "admin@ticketease.io", password: "adminadmin", name: "Admin" },
-];
-
 export default function LoginPage() {
-  const [isSuccess, setIsSuccess] = React.useState(false);
-
   const [step, setStep] = React.useState(1);
 
   const form = useForm({
@@ -34,61 +27,6 @@ export default function LoginPage() {
     },
   });
 
-  const checkStepValid = () => {
-    if (step === 1) {
-      const emailField = form.getFieldMeta("email");
-      return emailField?.isValid === true && emailField?.isTouched === true;
-    }
-    if (step === 2) {
-      const phoneField = form.getFieldMeta("phone");
-      const firstNameField = form.getFieldMeta("firstName");
-      const lastNameField = form.getFieldMeta("lastName");
-      const birthDateField = form.getFieldMeta("birthDate");
-      const genderField = form.getFieldMeta("gender");
-      const passwordField = form.getFieldMeta("password");
-      
-      return (
-        phoneField?.isValid === true && phoneField?.isTouched === true &&
-        firstNameField?.isValid === true && firstNameField?.isTouched === true &&
-        lastNameField?.isValid === true && lastNameField?.isTouched === true &&
-        birthDateField?.isValid === true && birthDateField?.isTouched === true &&
-        genderField?.isValid === true && genderField?.isTouched === true &&
-        passwordField?.isValid === true && passwordField?.isTouched === true
-      );
-    }
-    if (step === 3) {
-      const roleField = form.getFieldMeta("role");
-      return roleField?.isValid === true && roleField?.isTouched === true;
-    }
-    return false;
-  };
-
-  const isStepValid = checkStepValid();
-
-// 👇 daftar field yang valid
-type FieldName =
-  | "email"
-  | "firstName"
-  | "lastName"
-  | "birthDate"
-  | "gender"
-  | "password"
-  | "role"
-  | "phone"
-  | "phone.number"
-  | "phone.code";
-
-// 👇 mapping field per step
-const stepFields: Record<number, FieldName[]> = {
-  1: ["email"],
-  2: ["phone", "firstName", "lastName", "birthDate", "gender", "password"],
-  3: ["role"],
-};
-
-// 👇 gunakan state `step` yang sudah ada
-const currentStep = step;
-
-
   return (
     <div className="min-h-100vh">
       <ToastContainer />
@@ -106,10 +44,26 @@ const currentStep = step;
 
         <div className="flex items-center justify-center">
           <div className="w-full max-w-md flex flex-col gap-8 bg-(--color-surface-1) rounded-2xl p-6">
-            <div className=" relative text-center">
-              <h1 className="text-3xl font-bold text-transparent bg-gradient-to-r from-white to-orange-600 bg-clip-text mb-2">Daftar Akun Baru</h1>
-              <p className="text-transparent bg-gradient-to-r from-white to-orange-600 bg-clip-text">Silakan lengkapi data diri Anda untuk mendaftar</p>
-            </div>
+            {step === 1 && (
+              <div className="relative text-center">
+                <h2 className="text-3xl font-bold text-transparent bg-gradient-to-r from-white to-orange-600 bg-clip-text mb-2">Enter Your Email</h2>
+                <p className="text-transparent bg-gradient-to-r from-white to-orange-600 bg-clip-text">We'll use this email to keep your account secure and send important updates.</p>
+              </div>
+            )}
+
+            {step === 2 && (
+              <div className="relative text-center">
+                <h2 className="text-3xl font-bold text-transparent bg-gradient-to-r from-white to-orange-600 bg-clip-text mb-2">Complete Your Profile</h2>
+                <p className="text-transparent bg-gradient-to-r from-white to-orange-600 bg-clip-text">Help us get to know you better by completing your profile.</p>
+              </div>
+            )}
+
+            {step === 3 && (
+              <div className="relative text-center">
+                <h2 className="text-3xl font-bold text-transparent bg-gradient-to-r from-white to-orange-600 bg-clip-text mb-2">Choose Your Role</h2>
+                <p className="text-transparent bg-gradient-to-r from-white to-orange-600 bg-clip-text">Select your role to get started as an Attendee or organize your own events.</p>
+              </div>
+            )}
 
             <form
               onSubmit={(e: any) => {
@@ -165,7 +119,7 @@ const currentStep = step;
                       onChangeAsyncDebounceMs: 500,
                       onChangeAsync: async ({ value }) => {
                         if (!value || !value.code || !value.number) {
-                          return "Phone number lengkap wajib diisi";
+                          return "Full phone number is required";
                         }
                         return undefined;
                       },
@@ -179,16 +133,20 @@ const currentStep = step;
                           {field.state.meta.isTouched && !field.state.meta.isValid && <em className="text-sm font-semibold text-red-500">{field.state.meta.errors.join(", ")}</em>}
                         </div>
 
-                        <div className="flex gap-2">
-                          <select value={field.value?.code || ""} onChange={(e) => field.handleChange({ ...field.value, code: e.target.value })} className="border-2 rounded-lg px-2 py-2 bg-(--color-surface-1)">
-                            <option value="">Code</option>
-                            <option value="62">62</option>
-                            <option value="081">081</option>
-                            <option value="082">082</option>
+                        <div className="flex gap-2 ">
+                          <select value={field.state.value?.code || ""} onChange={(e) => field.handleChange({ ...field.state.value, code: e.target.value })} className="border-2 rounded-lg bg-(--color-surface-1) p-2">
+                            <option value="" disabled selected>
+                              Code
+                            </option>
+                            <option value="+62" selected>
+                              +62
+                            </option>
+                            <option value="+1">+1</option>
+                            <option value="+44">+44</option>
                           </select>
 
-                          <div className="relative flex-1">
-                            <input id="phone" type="tel" placeholder="Phone number" value={field.value?.number || ""} onChange={(e) => field.handleChange({ ...field.value, number: e.target.value })} className="flex-1 border-2 outline-none rounded-lg px-3 py-2 bg-(--color-surface-1)" />
+                          <div className="w-full relative">
+                            <input id="phone" type="tel" placeholder="phone number" value={field.state.value?.number || ""} onChange={(e) => field.handleChange({ ...field.state.value, number: e.target.value })} className="w-full border-2 outline-none rounded-lg bg-(--color-surface-1) px-4 py-2 transition-colors duration-150 focus:border-orange-600" />
                             <Phone className="absolute top-1/2 -translate-y-1/2 right-4" />
                             {field.getMeta().isValidating && (
                               <div>
@@ -265,8 +223,6 @@ const currentStep = step;
                     )}
                   />
 
-
-
                   <form.Field
                     name="birthDate"
                     validators={{
@@ -317,17 +273,15 @@ const currentStep = step;
                           {field.state.meta.isTouched && !field.state.meta.isValid && <em className="text-sm font-semibold text-red-500">{field.state.meta.errors.join(", ")}</em>}
                         </div>
 
-                        <div className="flex gap-6">
-                          {/* Radio Male */}
-                          <label className="flex items-center gap-2 cursor-pointer">
-                            <input type="radio" name="gender" value="male" checked={field.value === "male"} onChange={(e) => field.handleChange(e.target.value)} className="accent-orange-600" />
-                            <span>Male</span>
+                        <div className="flex gap-12">
+                          <label htmlFor="male" className="flex items-center gap-2 cursor-pointer">
+                            <input id="male" type="radio" name="gender" value="MALE" checked={field.state.value === "MALE"} onChange={(e) => field.handleChange(e.target.value)} className="accent-orange-600" />
+                            <span className="font-semibold">MALE</span>
                           </label>
 
-                          {/* Radio Female */}
-                          <label className="flex items-center gap-2 cursor-pointer">
-                            <input type="radio" name="gender" value="female" checked={field.value === "female"} onChange={(e) => field.handleChange(e.target.value)} className="accent-orange-600" />
-                            <span>Female</span>
+                          <label htmlFor="female" className="flex items-center gap-2 cursor-pointer">
+                            <input id="female" type="radio" name="gender" value="FEMALE" checked={field.state.value === "FEMALE"} onChange={(e) => field.handleChange(e.target.value)} className="accent-orange-600" />
+                            <span className="font-semibold">FEMALE</span>
                           </label>
                         </div>
                       </div>
@@ -387,17 +341,15 @@ const currentStep = step;
                         {field.state.meta.isTouched && !field.state.meta.isValid && <em className="text-sm font-semibold text-red-500">{field.state.meta.errors.join(", ")}</em>}
                       </div>
 
-                      <div className="flex gap-6">
-                        {/* Radio Admin */}
+                      <div className="flex gap-12">
                         <label className="flex items-center gap-2 cursor-pointer">
-                          <input type="radio" name="role" value="attendee" checked={field.value === "attendee"} onChange={(e) => field.handleChange(e.target.value)} className="accent-orange-600" />
-                          <span>Attendee</span>
+                          <input type="radio" name="role" value="ATTENDEE" checked={field.state.value === "ATTENDEE"} onChange={(e) => field.handleChange(e.target.value)} className="accent-orange-600" />
+                          <span className="font-semibold">ATTENDEE</span>
                         </label>
 
-                        {/* Radio User */}
                         <label className="flex items-center gap-2 cursor-pointer">
-                          <input type="radio" name="role" value="eventOrganizer" checked={field.value === "eventOrganizer"} onChange={(e) => field.handleChange(e.target.value)} className="accent-orange-600" />
-                          <span>User</span>
+                          <input type="radio" name="role" value="EVENT ORGANIZER" checked={field.state.value === "EVENT ORGANIZER"} onChange={(e) => field.handleChange(e.target.value)} className="accent-orange-600" />
+                          <span className="font-semibold">EVENT ORGANIZER</span>
                         </label>
                       </div>
                     </div>
@@ -405,55 +357,34 @@ const currentStep = step;
                 />
               )}
 
-              <button 
-                type="submit" 
-                disabled={!isStepValid}
-                className="w-full flex items-center justify-center gap-2 font-semibold rounded-lg bg-gradient-to-r from-orange-500 to-orange-600 disabled:opacity-50 disabled:cursor-not-allowed py-2 px-4 transition-opacity duration-200"
-              >
-                {step === 3 ? "Submit" : "Next"}
-              </button>
+              <form.Subscribe
+                selector={(state) => {
+                  if (step === 1) {
+                    const emailField = state.fieldMeta.email;
+                    return emailField?.isValid === true && emailField?.isTouched === true;
+                  }
+                  if (step === 2) {
+                    const phoneField = state.fieldMeta.phone;
+                    const firstNameField = state.fieldMeta.firstName;
+                    const lastNameField = state.fieldMeta.lastName;
+                    const birthDateField = state.fieldMeta.birthDate;
+                    const genderField = state.fieldMeta.gender;
+                    const passwordField = state.fieldMeta.password;
+                    return phoneField?.isValid === true && phoneField?.isTouched === true && firstNameField?.isValid === true && firstNameField?.isTouched === true && lastNameField?.isValid === true && lastNameField?.isTouched === true && birthDateField?.isValid === true && birthDateField?.isTouched === true && genderField?.isValid === true && genderField?.isTouched === true && passwordField?.isValid === true && passwordField?.isTouched === true;
+                  }
+                  if (step === 3) {
+                    const roleField = state.fieldMeta.role;
+                    return roleField?.isValid === true && roleField?.isTouched === true;
+                  }
+                  return false;
+                }}
+                children={(isStepValid) => (
+                  <button type="submit" disabled={!isStepValid} className="w-full flex items-center justify-center gap-2 font-semibold rounded-lg bg-gradient-to-r from-orange-500 to-orange-600 disabled:opacity-50 disabled:cursor-not-allowed py-2 px-4 transition-opacity duration-200">
+                    {step === 3 ? "Submit" : "Next"}
+                  </button>
+                )}
+              />
             </form>
-
-            <div className="flex flex-col justify-center gap-6 mb-4">
-              <span className="text-sm font-semibold text-center">Login lebih cepat dengan</span>
-              <ul className="flex justify-center items-center gap-6">
-                <li className="border border-white rounded-lg p-2 cursor-pointer">
-                  <FontAwesomeIcon icon={faGoogle} />
-                </li>
-                <li className="border border-white rounded-lg p-2 cursor-pointer">
-                  <FontAwesomeIcon icon={faFacebook} />
-                </li>
-                <li className="border border-white rounded-lg p-2 cursor-pointer">
-                  <FontAwesomeIcon icon={faApple} />
-                </li>
-                <li className="border border-white rounded-lg p-2 cursor-pointer">
-                  <FontAwesomeIcon icon={faTiktok} />
-                </li>
-              </ul>
-            </div>
-
-            <div className="text-sm font-semibold flex justify-center mb-2">
-              <span>
-                Sudah punya akun?{" "}
-                <a href="/login" className="text-orange-600 relative after:content-[''] after:w-full after:h-[1px] after:absolute after:bottom-0 after:left-0 after:rounded-full after:bg-orange-600 after:origin-right after:scale-x-0 after:transition-transform after:duration-150 after:ease-in hover:after:scale-x-100 hover:after:origin-left">
-                  Masuk di sini!
-                </a>
-              </span>
-            </div>
-
-            <div>
-              <p className="text-sm font-semibold text-center">
-                Dengan log in, kamu menyetujui{" "}
-                <a href="">
-                  <span className="text-orange-600">Kebijakan Privasi</span>
-                </a>{" "}
-                dan{" "}
-                <a href="">
-                  <span className="text-orange-600">Syarat & Ketentuan</span>
-                </a>{" "}
-                TicketEase
-              </p>
-            </div>
           </div>
         </div>
       </div>
