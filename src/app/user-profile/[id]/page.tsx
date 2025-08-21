@@ -384,39 +384,38 @@ export default function UserProfile({ params }: { params: { id: string } }) {
                 )}
               />
 
-
-                <form.Field
-                  name="role"
-                  validators={{
-                    onChangeAsyncDebounceMs: 500,
-                    onChangeAsync: async ({ value }) => {
-                      if (!value) {
-                        return "Role is required";
-                      }
-                      return undefined;
-                    },
-                  }}
-                  children={(field: any) => (
-                    <div className="flex flex-col gap-2">
-                      <div className="flex flex-row justify-between">
-                        <label className="text-sm font-semibold">Role</label>
-                        {field.state.meta.isTouched && !field.state.meta.isValid && <em className="text-sm font-semibold text-red-500">{field.state.meta.errors.join(", ")}</em>}
-                      </div>
-
-                      <div className="flex gap-12">
-                        <label className="flex items-center gap-2 cursor-pointer">
-                          <input type="radio" name="role" value="ATTENDEE" checked={field.state.value === "ATTENDEE"} onChange={(e) => field.handleChange(e.target.value)} disabled={!isEditMode} className="accent-orange-600" />
-                          <span className="font-semibold">ATTENDEE</span>
-                        </label>
-
-                        <label className="flex items-center gap-2 cursor-pointer">
-                          <input type="radio" name="role" value="EVENT ORGANIZER" checked={field.state.value === "EVENT ORGANIZER"} onChange={(e) => field.handleChange(e.target.value)} disabled={!isEditMode} className="accent-orange-600" />
-                          <span className="font-semibold">EVENT ORGANIZER</span>
-                        </label>
-                      </div>
+              <form.Field
+                name="role"
+                validators={{
+                  onChangeAsyncDebounceMs: 500,
+                  onChangeAsync: async ({ value }) => {
+                    if (!value) {
+                      return "Role is required";
+                    }
+                    return undefined;
+                  },
+                }}
+                children={(field: any) => (
+                  <div className="flex flex-col gap-2">
+                    <div className="flex flex-row justify-between">
+                      <label className="text-sm font-semibold">Role</label>
+                      {field.state.meta.isTouched && !field.state.meta.isValid && <em className="text-sm font-semibold text-red-500">{field.state.meta.errors.join(", ")}</em>}
                     </div>
-                  )}
-                />
+
+                    <div className="flex gap-12">
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input type="radio" name="role" value="ATTENDEE" checked={field.state.value === "ATTENDEE"} onChange={(e) => field.handleChange(e.target.value)} disabled={!isEditMode} className="accent-orange-600" />
+                        <span className="font-semibold">ATTENDEE</span>
+                      </label>
+
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input type="radio" name="role" value="EVENT ORGANIZER" checked={field.state.value === "EVENT ORGANIZER"} onChange={(e) => field.handleChange(e.target.value)} disabled={!isEditMode} className="accent-orange-600" />
+                        <span className="font-semibold">EVENT ORGANIZER</span>
+                      </label>
+                    </div>
+                  </div>
+                )}
+              />
 
               <div className="flex gap-4">
                 {isEditMode ? (
