@@ -1,7 +1,9 @@
+import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { authUser } from "@/service/auth.api";
+import { authUser, AuthError } from "@/service/auth.api";
+import type { NextAuthOptions } from "next-auth";
 
-export const authOptions = {
+export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
       name: "Credentials",
@@ -18,7 +20,6 @@ export const authOptions = {
           const user = await authUser({
             username: credentials.username,
             password: credentials.password,
-            expiresInMins: 30,
           });
 
           if (user) {
@@ -26,7 +27,10 @@ export const authOptions = {
           }
           return null;
         } catch (error) {
-          throw new Error(error.message || "Login failed");
+          if (error instanceof AuthError) {
+            throw new Error(error.message);
+          }
+          throw new Error("Login failed");
         }
       },
     }),
@@ -58,4 +62,13 @@ export const authOptions = {
       return url.startsWith(baseUrl) ? url : baseUrl + "/dashboard";
     },
   },
+  pages: {
+    signIn: "/login",
+    error: "/login",
+  },
+  secret: process.env.NEXTAUTH_SECRET,
 };
+
+const handler = NextAuth(authOptions);
+
+export { handler as GET, handler as POST };

@@ -1,15 +1,24 @@
 import { QueryClient } from "@tanstack/react-query";
-import { HttpError } from "@/service/event-api";
+import { FetchEvent } from "@/service/event-api";
+import { AuthError } from "@/service/auth.api";
 
 const queryConfig = new QueryClient({
   defaultOptions: {
     queries: {
-      retry: (count, err) => {
-        const error = err as unknown;
-        if (!(error instanceof HttpError)) return count < 3;
-        if (error.type === "CANCELED_ERROR") return false;
-        if (error.type === "CLIENT_ERROR") return false;
-        return count < 3;
+      retry: (count, err: unknown) => {
+        if (err instanceof FetchEvent) {
+          if (["SERVER_ERROR", "NETWORK_ERROR"].includes(err.type)) {
+            return count < 3;
+          }
+          return false;
+        }
+        if (err instanceof AuthError) {
+          if (["SERVER_ERROR", "NETWORK_ERROR"].includes(err.type)) {
+            return count < 3;
+          }
+          return false;
+        }
+        return false;
       },
       retryDelay: (attempt) => Math.min(3000, 300 * 2 ** attempt),
       staleTime: 60_000,

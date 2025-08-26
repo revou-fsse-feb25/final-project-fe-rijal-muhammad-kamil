@@ -1,58 +1,57 @@
-// service/auth-user-api.ts
-import axios, { AxiosError } from "axios";
-import { HttpError } from "./event-api";
+import axios, { AxiosInstance, AxiosResponse, AxiosError } from "axios";
 
-interface AuthPayload {
-  username: string;
-  password: string;
-  email?: string; // untuk register
-  firstName?: string; // untuk register
-  lastName?: string; // untuk register
-  expiresInMins?: number;
+const authApi: AxiosInstance = axios.create({
+  baseURL: process.env.NEXT_PUBLIC_API_URL,
+  withCredentials: true,
+});
+
+export class AuthError extends Error {
+  constructor(
+    public type: "TIMEOUT_ERROR" | "NETWORK_ERROR" | "UNAUTHORIZED" | "FORBIDDEN" | "INVALID_CREDENTIALS" | "SERVER_ERROR" | "CANCELED_ERROR" | "UNKNOWN_AUTH_ERROR",
+    public message: string,
+    public status?: number,
+    options?: { cause?: unknown },
+  ) {
+    super(message);
+    this.name = "AuthError";
+    if (options?.cause) (this as any).cause = options.cause;
+  }
 }
 
-interface AuthResponse {
-  id: number | string;
-  username: string;
-  email: string;
-  firstName?: string;
-  lastName?: string;
-  image?: string;
-  accessToken: string;
+interface AuthRequestOptions {
+  endpoint?: string;
+  timeout?: number;
+  cacheControl?: string;
+  signal?: AbortSignal;
+  username?: string;
+  password?: string;
 }
 
-export async function authUser(payload: AuthPayload, mode: "login" | "register"): Promise<AuthResponse> {
+export async function authUser({ endpoint = "/auth/login", timeout = 30000, username, password, cacheControl = "no-store", signal }: AuthRequestOptions) {
+  if (!username || !password) {
+    throw new AuthError("INVALID_CREDENTIALS", "Username and password must be filled in");
+  }
+
   try {
-    const url = mode === "login" ? "/auth/login" : "/auth/register"; // sesuaikan endpoint-mu
-    const res = await axios.post<AuthResponse>(url, payload, {
-      baseURL: "http://localhost:3000", // ganti sesuai API
-      headers: { "Content-Type": "application/json" },
-      timeout: 30000,
-      withCredentials: true,
-    });
-
+    const res: AxiosResponse<any> = await authApi.post(endpoint, { username, password }, { timeout, headers: { "Cache-Control": cacheControl }, signal });
     return res.data;
   } catch (err: unknown) {
     if (axios.isAxiosError(err)) {
       const e = err as AxiosError<any>;
       const status = e.response?.status;
-      const serverMsg = e.response?.data?.message as string | undefined;
+      const serverMsg = e.response?.data?.message ?? e.response?.data?.error ?? (typeof e.response?.data === "string" ? e.response?.data : undefined);
 
-      if (e.code === "ECONNABORTED") {
-        throw new HttpError("TIMEOUT_ERROR", "The request took too long to respond. Please try again.", status, { cause: err });
-      }
-      if (!e.response) {
-        throw new HttpError("NETWORK_ERROR", "Unable to connect to the server. Please check your internet connection.", undefined, { cause: err });
-      }
-      if (status && status >= 400 && status < 500) {
-        throw new HttpError("CLIENT_ERROR", serverMsg ?? (mode === "login" ? "Incorrect username or password." : "Failed to register."), status, { cause: err });
-      }
-      if (status && status >= 500 && status < 600) {
-        throw new HttpError("SERVER_ERROR", serverMsg ?? "Server error. Please try again later.", status, { cause: err });
-      }
-      throw new HttpError("UNKNOWN_AXIOS_ERROR", serverMsg ?? "An unknown Axios error occurred.", status, { cause: err });
+      if (e.code === "ERR_CANCELED") throw new AuthError("CANCELED_ERROR", serverMsg ?? "Request was canceled.", status, { cause: err });
+      if (e.code === "ECONNABORTED") throw new AuthError("TIMEOUT_ERROR", "The request took too long to respond. Please try again.", status, { cause: err });
+      if (!e.response) throw new AuthError("NETWORK_ERROR", serverMsg ?? "Cannot reach authentication server.", undefined, { cause: err });
+      if (status === 401) throw new AuthError("UNAUTHORIZED", serverMsg ?? "Unauthorized", status, { cause: err });
+      if (status === 403) throw new AuthError("FORBIDDEN", serverMsg ?? "Forbidden", status, { cause: err });
+      if (status && status >= 400 && status < 500) throw new AuthError("INVALID_CREDENTIALS", serverMsg ?? `Invalid credentials (${status})`, status, { cause: err });
+      if (status && status >= 500) throw new AuthError("SERVER_ERROR", serverMsg ?? `Server error (${status})`, status, { cause: err });
+
+      throw new AuthError("UNKNOWN_AUTH_ERROR", serverMsg ?? "Unknown authentication error", status, { cause: err });
     }
 
-    throw new HttpError("UNKNOWN_ERROR", "An unknown error occurred.", undefined, { cause: err });
+    throw new AuthError("UNKNOWN_AUTH_ERROR", "Unknown authentication error", undefined, { cause: err });
   }
 }
