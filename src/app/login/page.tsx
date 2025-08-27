@@ -1,43 +1,56 @@
 "use client";
 
 import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
+import { authUser, AuthError } from "@/service/auth.api";
+import { signIn } from "next-auth/react";
 import { useForm } from "@tanstack/react-form";
-import Image from "next/image";
 import { toast, ToastContainer } from "react-toastify";
+import Image from "next/image";
 import "react-toastify/dist/ReactToastify.css";
-import { Mail, MailOpen, Lock, LockOpen, LoaderCircle } from "lucide-react";
+import { LoaderCircle, Mail, MailOpen, Lock, LockOpen } from "lucide-react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGoogle, faFacebook, faApple, faTiktok } from "@fortawesome/free-brands-svg-icons";
 
-const mockUsers: { id: string; email: string; password: string; name: string }[] = [
-  { id: "u_1", email: "user@example.com", password: "password123", name: "Sample User" },
-  { id: "u_2", email: "admin@ticketease.io", password: "adminadmin", name: "Admin" },
-];
-
 export default function LoginPage() {
   const [isSuccess, setIsSuccess] = useState(false);
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+
+  const mutation = useMutation({
+    mutationFn: ({ email, password }: { email: string; password: string }) => authUser({ email, password }),
+    onSuccess: async (data) => {
+      const token = data.data.access_token;
+      const user = data.data.user;
+
+      await signIn("credentials", {
+        token,
+        user: JSON.stringify(user),
+        redirect: true,
+      });
+      setIsSuccess(true);
+      toast.success(`Selamat datang, ${user.email}!`);
+    },
+    onError: (err: any) => {
+      if (err instanceof AuthError) {
+        if (err.type === "INVALID_CREDENTIALS" || err.type === "UNAUTHORIZED" || err.type === "FORBIDDEN") {
+          const msg = Array.isArray(err.message) ? err.message.join(", ") : err.message;
+          setEmailError(msg);
+          setPasswordError(msg);
+        }
+      } else {
+        const msg = Array.isArray(err.message) ? err.message.join(", ") : err.message;
+        toast.error(msg);
+      }
+    },
+  });
 
   const form = useForm({
     defaultValues: { email: "", password: "" },
-    onSubmit: async ({ value }: any) => {
-      try {
-        const user = await new Promise<(typeof mockUsers)[0] | null>((resolve) => {
-          setTimeout(() => {
-            const found = mockUsers.find((u) => u.email === value.email && u.password === value.password);
-            resolve(found || null);
-          }, 3000);
-        });
-
-        if (!user) {
-          throw new Error("Email atau password salah");
-        }
-
-        setIsSuccess(true);
-        toast.success(`Selamat datang, ${user.name}!`);
-      } catch (error: any) {
-        console.error("Login error:", error);
-        toast.error(error.message || "Terjadi kesalahan");
-      }
+    onSubmit: ({ value }: any) => {
+      setEmailError("");
+      setPasswordError("");
+      mutation.mutate({ email: value.email, password: value.password });
     },
   });
 
@@ -77,10 +90,10 @@ export default function LoginPage() {
                   onChangeAsyncDebounceMs: 500,
                   onChangeAsync: async ({ value }) => {
                     if (!value) {
-                      return "Email is required";
+                      return "Email must not be empty";
                     }
                     if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(value)) {
-                      return "Invalid email address";
+                      return "Email is not valid";
                     }
                     return undefined;
                   },
@@ -102,6 +115,7 @@ export default function LoginPage() {
                         </div>
                       )}
                     </div>
+                    {emailError && <em className="text-sm font-semibold text-red-500">{emailError}</em>}
                   </div>
                 )}
               />
@@ -112,7 +126,7 @@ export default function LoginPage() {
                   onChangeAsyncDebounceMs: 500,
                   onChangeAsync: async ({ value }) => {
                     if (!value) {
-                      return "Password is required";
+                      return "Password must not be empty";
                     }
                     return undefined;
                   },
@@ -134,6 +148,7 @@ export default function LoginPage() {
                         </div>
                       )}
                     </div>
+                    {passwordError && <em className="text-sm font-semibold text-red-500">{passwordError}</em>}
                   </div>
                 )}
               />

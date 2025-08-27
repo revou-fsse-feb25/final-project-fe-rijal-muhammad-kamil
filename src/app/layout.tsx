@@ -4,13 +4,12 @@ import type { Metadata } from "next";
 import { Inter, Caveat } from "next/font/google";
 import "./globals.css";
 import QueryProviders from "@/context/query-provider";
-import AuthProvider from "@/context/auth-provider";
 import Image from "next/image";
 import { HeaderMainNavbar, HeaderSecondaryNavbar, HeaderThirdNavbar } from "@/container/navbar";
 import { HeaderLogo } from "@/container/logo";
 import EventSearch from "@/container/event-search/event-search";
 import { usePathname } from "next/navigation";
-import path from "path";
+
 const inter = Inter({
   variable: "--font-primary",
   subsets: ["latin"],
@@ -40,7 +39,6 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="en" className="text-base">
       <body className={`${inter.variable} ${caveat.variable} antialiased font-(family-name:--font-primary) tracking-normal leading-normal text-white bg-(--background-color)`}>
         <QueryProviders>
-          <AuthProvider>
           {!isLoginPage && !isRegisterPage && !isUserProfile && !isCreateEvent && (
             <header className="w-full absolute top-0 z-50 px-8 sm:px-16 lg:px-32 2xl:px-64">
               <div className="flex justify-end items-center relative py-2 after:content-[''] after:w-full after:h-0.5 after:absolute after:bottom-0 after:left-0 after:rounded-full after:bg-(--color-surface-2-transparant)">
@@ -72,7 +70,6 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             </section>
           )}
           <main className={`flex flex-col gap-16 ${isLoginPage || isRegisterPage || isUserProfile || isCreateEvent ? "" : "px-8 sm:px-16 lg:px-32 2xl:px-64"}`}>{children}</main>
-          </AuthProvider>
         </QueryProviders>
       </body>
     </html>

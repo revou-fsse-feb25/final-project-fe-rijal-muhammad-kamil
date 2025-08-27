@@ -1,7 +1,7 @@
 import axios, { AxiosInstance, AxiosResponse, AxiosError } from "axios";
 
 const authApi: AxiosInstance = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL,
+  baseURL: "https://final-project-be-rijal-muhammad-kamil-production.up.railway.app",
   withCredentials: true,
 });
 
@@ -23,17 +23,17 @@ interface AuthRequestOptions {
   timeout?: number;
   cacheControl?: string;
   signal?: AbortSignal;
-  username?: string;
+  email?: string;
   password?: string;
 }
 
-export async function authUser({ endpoint = "/auth/login", timeout = 30000, username, password, cacheControl = "no-store", signal }: AuthRequestOptions) {
-  if (!username || !password) {
-    throw new AuthError("INVALID_CREDENTIALS", "Username and password must be filled in");
+export async function authUser({ endpoint = "/auth/login", timeout = 30000, email, password, cacheControl = "no-store", signal }: AuthRequestOptions) {
+  if (!email || !password) {
+    throw new AuthError("INVALID_CREDENTIALS", "email and password must be filled in");
   }
 
   try {
-    const res: AxiosResponse<any> = await authApi.post(endpoint, { username, password }, { timeout, headers: { "Cache-Control": cacheControl }, signal });
+    const res: AxiosResponse<any> = await authApi.post(endpoint, { email, password }, { timeout, headers: { "Cache-Control": cacheControl }, signal });
     return res.data;
   } catch (err: unknown) {
     if (axios.isAxiosError(err)) {
