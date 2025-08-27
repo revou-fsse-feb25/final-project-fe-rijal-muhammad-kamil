@@ -5,104 +5,92 @@ import { useForm } from "@tanstack/react-form";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Mail, LoaderCircle, UserRoundPen, Phone, Calendar, Lock } from "lucide-react";
-
-// Mock API functions
-const fetchUserProfile = async (userId: string) => {
-  console.log(`Fetching profile for userId: ${userId}`);
-  // Simulate API delay
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-  // Mock user data
-  return {
-    email: "rijal.kamil@example.com",
-    phone: { code: "+62", number: "81234567890" },
-    firstName: "Rijal",
-    lastName: "Kamil",
-    birthDate: "1990-01-01",
-    gender: "MALE",
-    role: "ATTENDEE",
-    password: "password123",
-  };
-};
-
-const updateUserProfile = async (userId: string, data: any) => {
-  console.log(`Updating profile for userId: ${userId}`, data);
-  // Simulate API delay
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-  toast.success("Profile updated successfully!");
-  return { success: true };
-};
-
-const deleteUserProfile = async (userId: string) => {
-  console.log(`Deleting profile for userId: ${userId}`);
-  // Simulate API delay
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-  toast.success("Profile deleted successfully!");
-  return { success: true };
-};
+import { useMutation } from "@tanstack/react-query";
+import { fetchUser } from "@/service/user.api";
 
 export default function UserProfile({ params }: { params: { id: string } }) {
+
   const [isEditMode, setIsEditMode] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [initialData, setInitialData] = useState<any>(null);
 
   const form = useForm({
     defaultValues: {
       email: "",
-      phone: { code: "", number: "" },
-      firstName: "",
-      lastName: "",
-      birthDate: "",
+      phone_number: { code: "", number: "" },
+      first_name: "",
+      last_name: "",
+      birth_of_birth: "",
       gender: "",
       password: "",
       role: "",
     },
     onSubmit: async ({ value }: any) => {
-      await updateUserProfile(params.id, value);
-      setIsEditMode(false);
-      setInitialData(value);
+      try {
+        await updateUserMutation.mutateAsync(value);
+        setIsEditMode(false);
+        setInitialData(value);
+      } catch (err: any) {
+        toast.error(err.message || "Failed to update profile");
+      }
     },
   });
 
+  const fetchUserMutation = useMutation({
+    mutationFn: async () => fetchUser({ endpoint: `/users/${params.id}`, method: "GET" }),
+    onSuccess: (data: any) => {
+      form.setFieldValue("email", data.email);
+      form.setFieldValue("phone_number", { code: data.phone_number.code, number: data.phone_number.number });
+      form.setFieldValue("first_name", data.first_name);
+      form.setFieldValue("last_name", data.last_name);
+      form.setFieldValue("birth_of_birth", data.birth_of_birth);
+      form.setFieldValue("gender", data.gender);
+      form.setFieldValue("password", data.password);
+      form.setFieldValue("role", data.role);
+      setInitialData(data);
+    },
+    onError: (err: any) => {
+      console.error(err);
+      toast.error(err.message || "Failed to fetch user");
+    },
+  });
+
+  const updateUserMutation = useMutation({
+    mutationFn: async (data: any) => fetchUser({ endpoint: `/users/${params.id}`, method: "PUT", data }),
+    onSuccess: () => toast.success("Profile updated successfully!"),
+    onError: (err: any) => toast.error(err.message || "Failed to update profile"),
+  });
+
+  const deleteUsereMutation = useMutation({
+    mutationFn: async () => fetchUser({ endpoint: `/users/${params.id}`, method: "DELETE" }),
+    onSuccess: () => toast.success("Profile deleted successfully!"),
+    onError: (err: any) => toast.error(err.message || "Failed to delete profile"),
+  });
+
   useEffect(() => {
-    const loadUserProfile = async () => {
-      setIsLoading(true);
-      try {
-        const data = await fetchUserProfile(params.id);
-        form.setFieldValue("email", data.email);
-        form.setFieldValue("phone", data.phone);
-        form.setFieldValue("firstName", data.firstName);
-        form.setFieldValue("lastName", data.lastName);
-        form.setFieldValue("birthDate", data.birthDate);
-        form.setFieldValue("gender", data.gender);
-        form.setFieldValue("password", data.password);
-        form.setFieldValue("role", data.role);
-        setInitialData(data);
-      } catch (error) {
-        toast.error("Failed to fetch profile.");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    loadUserProfile();
-  }, [params.id, form]);
+    setIsLoading(true);
+    fetchUserMutation.mutate();
+  }, );
 
   const handleCancel = () => {
-    if (initialData) {
-      form.setFieldValue("email", initialData.email);
-      form.setFieldValue("phone", initialData.phone);
-      form.setFieldValue("firstName", initialData.firstName);
-      form.setFieldValue("lastName", initialData.lastName);
-      form.setFieldValue("birthDate", initialData.birthDate);
-      form.setFieldValue("gender", initialData.gender);
-      form.setFieldValue("password", initialData.password);
-      form.setFieldValue("role", initialData.role);
-    }
+    if (!initialData) return;
+
+    form.setFieldValue("email", initialData.email);
+    form.setFieldValue("phone_number.code", initialData.phone_number.code);
+    form.setFieldValue("phone_number.number", initialData.phone_number.number);
+    form.setFieldValue("first_name", initialData.first_name);
+    form.setFieldValue("last_name", initialData.last_name);
+    form.setFieldValue("birth_of_birth", initialData.birth_of_birth);
+    form.setFieldValue("gender", initialData.gender);
+    form.setFieldValue("password", initialData.password);
+    form.setFieldValue("role", initialData.role);
+
     setIsEditMode(false);
   };
 
   const handleDelete = async () => {
-    await deleteUserProfile(params.id);
-    // Optionally, redirect or clear form here
+    await deleteUsereMutation.mutateAsync();
+    // opsional: redirect atau reset form
   };
 
   if (isLoading) {
@@ -178,7 +166,7 @@ export default function UserProfile({ params }: { params: { id: string } }) {
               />
 
               <form.Field
-                name="phone"
+                name="phone_number"
                 validators={{
                   onChangeAsyncDebounceMs: 500,
                   onChangeAsync: async ({ value }) => {
@@ -224,7 +212,7 @@ export default function UserProfile({ params }: { params: { id: string } }) {
               />
 
               <form.Field
-                name="firstName"
+                name="first_name"
                 validators={{
                   onChangeAsyncDebounceMs: 500,
                   onChangeAsync: async ({ value }) => {
@@ -256,7 +244,7 @@ export default function UserProfile({ params }: { params: { id: string } }) {
               />
 
               <form.Field
-                name="lastName"
+                name="last_name"
                 validators={{
                   onChangeAsyncDebounceMs: 500,
                   onChangeAsync: async ({ value }) => {
@@ -288,7 +276,7 @@ export default function UserProfile({ params }: { params: { id: string } }) {
               />
 
               <form.Field
-                name="birthDate"
+                name="birth_of_birth"
                 validators={{
                   onChangeAsyncDebounceMs: 500,
                   onChangeAsync: async ({ value }) => {
