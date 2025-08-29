@@ -2,6 +2,7 @@ import { Banner1, Banner2 } from "@/container/banner";
 import EventCarousel1 from "@/container/event-carousel-1/event-card-container";
 import EventCarousel2 from "@/container/event-carousel-2/event-card-container";
 import TopEvent from "@/container/top-event";
+import EventSearch from "@/container/event-search/event-search";
 
 export default function Main() {
   return (
@@ -10,6 +11,12 @@ export default function Main() {
         <div id="banner">
           <Banner1 />
         </div>
+        
+        {/* Event Search Section */}
+        <div className="flex justify-center px-4">
+          <EventSearch />
+        </div>
+        
         <div>
           <div>
             <h2 className="font-(family-name:--font-secondary) font-bold text-3xl text-orange-600 text-center mb-2">Upcoming</h2>

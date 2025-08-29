@@ -1,36 +1,162 @@
 "use client";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { useForm } from "@tanstack/react-form";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Layers, LoaderCircle, PencilLine, MapPin, Calendar, Clock, Plus, Trash2, Upload, DollarSign, Eye } from "lucide-react";
+import { fetchEvent, FetchEvent } from "../../service/event-api";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
-const createEvent = async (data: any) => {
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-  toast.success("Event created successfully!");
+// Types for categories
+interface EventCategory {
+  id: number;
+  name: string;
+}
 
-  return { success: true };
+interface TicketCategory {
+  id: number;
+  name: string;
+}
+
+const createEvent = async (data: any, token?: string) => {
+  try {
+    const transformedData = {
+      category_id: parseInt(data.category),
+      title: data.title,
+      description: data.description,
+      terms: data.terms,
+      location: data.location,
+      image_url: data.image_url,
+      status: data.status,
+      periods: data.periods.map((period: any) => ({
+        name: period.name,
+        start_date: period.start_date,
+        end_date: period.end_date,
+        start_time: period.start_time,
+        end_time: period.end_time,
+        status: period.status,
+        ticketTypes: period.ticketTypes.map((ticket: any) => ({
+          category_id: parseInt(ticket.category),
+          price: parseFloat(ticket.price),
+          discount: parseFloat(ticket.discount) || 0,
+          quota: parseInt(ticket.quota),
+          status: ticket.status,
+        }))
+      }))
+    };
+
+    const response = await fetchEvent({
+      endpoint: "/events",
+      method: "POST",
+      data: transformedData,
+      token: token,
+    });
+    
+    toast.success("Event created successfully!");
+    return { success: true, data: response };
+  } catch (error) {
+    if (error instanceof FetchEvent) {
+      toast.error(error.message);
+    } else {
+      toast.error("Failed to create event. Please try again.");
+    }
+    throw error;
+  }
 };
 
-const eventCategories = [
-  { id: 1, name: "Music" },
-  { id: 2, name: "Sports" },
-  { id: 3, name: "Technology" },
-  { id: 4, name: "Business" },
-  { id: 5, name: "Arts" },
-];
-
-const ticketCategories = [
-  { id: 1, name: "Regular" },
-  { id: 2, name: "VIP" },
-  { id: 3, name: "VVIP" },
-  { id: 4, name: "Student" },
-  { id: 5, name: "Early Bird" },
-];
 
 export default function CreateEventPage() {
   const [step, setStep] = React.useState(1);
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const { data: session, status } = useSession();
+  const router = useRouter();
+  const [eventCategories, setEventCategories] = useState<EventCategory[]>([]);
+  const [ticketCategories, setTicketCategories] = useState<TicketCategory[]>([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
+
+  // Default categories based on seed data
+  const defaultEventCategories: EventCategory[] = [
+    { id: 1, name: 'Music' },
+    { id: 2, name: 'Tech' },
+    { id: 3, name: 'Sports' },
+    { id: 4, name: 'Festival' },
+    { id: 5, name: 'Exhibition' }
+  ];
+
+  const defaultTicketCategories: TicketCategory[] = [
+    { id: 1, name: 'Early Bird' },
+    { id: 2, name: 'Regular' },
+    { id: 3, name: 'VIP' },
+    { id: 4, name: 'Student' },
+    { id: 5, name: 'Group' }
+  ];
+
+  // Fetch categories from API
+  const fetchCategories = async () => {
+    try {
+      setCategoriesLoading(true);
+      
+      // Try to fetch event categories from API
+      try {
+        const eventCategoriesResponse = await fetchEvent<EventCategory[]>({
+          endpoint: "/categories/events",
+          method: "GET"
+        });
+        setEventCategories(eventCategoriesResponse);
+      } catch (error) {
+        console.log("Using default event categories");
+        setEventCategories(defaultEventCategories);
+      }
+
+      // Try to fetch ticket categories from API
+      try {
+        const ticketCategoriesResponse = await fetchEvent<TicketCategory[]>({
+          endpoint: "/categories/tickets",
+          method: "GET"
+        });
+        setTicketCategories(ticketCategoriesResponse);
+      } catch (error) {
+        console.log("Using default ticket categories");
+        setTicketCategories(defaultTicketCategories);
+      }
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+      // Use default categories as fallback
+      setEventCategories(defaultEventCategories);
+      setTicketCategories(defaultTicketCategories);
+    } finally {
+      setCategoriesLoading(false);
+    }
+  };
+
+  // Fetch categories on component mount
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  // Redirect to login if not authenticated
+  React.useEffect(() => {
+    if (status === "unauthenticated") {
+      router.push("/login");
+    }
+  }, [status, router]);
+
+  // Show loading while checking authentication
+  if (status === "loading") {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <LoaderCircle className="animate-spin" size={32} />
+        <span className="ml-2">Loading...</span>
+      </div>
+    );
+  }
+
+  // Don't render if not authenticated
+  if (status === "unauthenticated") {
+    return null;
+  }
 
   const form = useForm({
     defaultValues: {
@@ -62,9 +188,20 @@ export default function CreateEventPage() {
       ],
     },
     onSubmit: async ({ value }: any) => {
-      await createEvent(value);
-      console.log("Submit form:", value);
-    },
+        setIsSubmitting(true);
+        try {
+          await createEvent(value, session?.access_token);
+          console.log("Submit form:", value);
+          // Reset form and redirect after successful submission
+          setTimeout(() => {
+            router.push("/event-profile"); // Redirect to event profile page
+          }, 2000);
+        } catch (error) {
+          console.error("Error creating event:", error);
+        } finally {
+          setIsSubmitting(false);
+        }
+      },
   });
 
   const addPeriod = () => {
@@ -200,7 +337,7 @@ export default function CreateEventPage() {
                             <option value="" disabled>
                               Select Category
                             </option>
-                            {eventCategories.map((cat) => (
+                            {eventCategories.map((cat: EventCategory) => (
                               <option key={cat.id} value={cat.id}>
                                 {cat.name}
                               </option>
@@ -715,11 +852,11 @@ export default function CreateEventPage() {
                                           <option value="" disabled>
                                             Select Category
                                           </option>
-                                          {ticketCategories.map((cat) => (
-                                            <option key={cat.id} value={cat.id}>
-                                              {cat.name}
-                                            </option>
-                                          ))}
+                                          {ticketCategories.map((cat: TicketCategory) => (
+                            <option key={cat.id} value={cat.id}>
+                              {cat.name}
+                            </option>
+                          ))}
                                         </select>
                                         <Layers className="absolute top-1/2 -translate-y-1/2 right-4" />
                                         {ticketField.state.meta.isValidating && (
@@ -942,8 +1079,15 @@ export default function CreateEventPage() {
                     return false;
                   }}
                   children={(isValid) => (
-                    <button type="submit" disabled={!isValid} className={`font-semibold w-full flex items-center justify-center gap-2 rounded-lg py-2 px-4 ${isValid ? "bg-gradient-to-r from-orange-500 to-orange-600 cursor-pointer" : "bg-gradient-to-r from-gray-500 to-gray-600 cursor-not-allowed"}`}>
-                      {step === 3 ? "Create Event" : "Next"}
+                    <button type="submit" disabled={!isValid || isSubmitting} className={`font-semibold w-full flex items-center justify-center gap-2 rounded-lg py-2 px-4 ${isValid && !isSubmitting ? "bg-gradient-to-r from-orange-500 to-orange-600 cursor-pointer" : "bg-gradient-to-r from-gray-500 to-gray-600 cursor-not-allowed"}`}>
+                      {isSubmitting && step === 3 ? (
+                        <>
+                          <LoaderCircle className="animate-spin" size={16} />
+                          Creating Event...
+                        </>
+                      ) : (
+                        step === 3 ? "Create Event" : "Next"
+                      )}
                     </button>
                   )}
                 />
