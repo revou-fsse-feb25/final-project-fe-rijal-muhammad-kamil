@@ -1,28 +1,31 @@
 "use client";
-import React, { useEffect, useState } from "react";
-import Image from "next/image";
+
+import { useSession } from "next-auth/react";
+import { useState, useEffect } from "react";
 import { useForm } from "@tanstack/react-form";
+import Image from "next/image";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { Mail, LoaderCircle, UserRoundPen, Phone, Calendar, Lock } from "lucide-react";
+import { Mail, LoaderCircle, UserRoundPen, Phone, Calendar } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import { fetchUser } from "@/service/user.api";
 
 export default function UserProfile({ params }: { params: { id: string } }) {
+  const { data: session } = useSession();
+  const token = session?.access_token;
 
   const [isEditMode, setIsEditMode] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const [initialData, setInitialData] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm({
     defaultValues: {
       email: "",
-      phone_number: { code: "", number: "" },
+      phone_number: "",
       first_name: "",
       last_name: "",
-      birth_of_birth: "",
+      date_of_birth: "",
       gender: "",
-      password: "",
       role: "",
     },
     onSubmit: async ({ value }: any) => {
@@ -37,63 +40,81 @@ export default function UserProfile({ params }: { params: { id: string } }) {
   });
 
   const fetchUserMutation = useMutation({
-    mutationFn: async () => fetchUser({ endpoint: `/users/${params.id}`, method: "GET" }),
-    onSuccess: (data: any) => {
+    mutationFn: async () => fetchUser({ endpoint: `/users/${params.id}`, method: "GET", token: token }),
+    onSuccess: (response: any) => {
+      setIsLoading(false);
+      if (!response || !response.data) return;
+      const data = response.data;
       form.setFieldValue("email", data.email);
-      form.setFieldValue("phone_number", { code: data.phone_number.code, number: data.phone_number.number });
+      form.setFieldValue("phone_number", data.phone_number);
       form.setFieldValue("first_name", data.first_name);
       form.setFieldValue("last_name", data.last_name);
-      form.setFieldValue("birth_of_birth", data.birth_of_birth);
+      form.setFieldValue("date_of_birth", data.date_of_birth);
       form.setFieldValue("gender", data.gender);
-      form.setFieldValue("password", data.password);
       form.setFieldValue("role", data.role);
       setInitialData(data);
     },
     onError: (err: any) => {
-      console.error(err);
+      setIsLoading(false);
       toast.error(err.message || "Failed to fetch user");
     },
   });
 
   const updateUserMutation = useMutation({
-    mutationFn: async (data: any) => fetchUser({ endpoint: `/users/${params.id}`, method: "PUT", data }),
+    mutationFn: async (data: any) => fetchUser({ endpoint: `/users/${params.id}`, method: "PATCH", data, token }),
     onSuccess: () => toast.success("Profile updated successfully!"),
     onError: (err: any) => toast.error(err.message || "Failed to update profile"),
   });
 
-  const deleteUsereMutation = useMutation({
-    mutationFn: async () => fetchUser({ endpoint: `/users/${params.id}`, method: "DELETE" }),
-    onSuccess: () => toast.success("Profile deleted successfully!"),
+  const deleteUserMutation = useMutation({
+    mutationFn: async () => fetchUser({ endpoint: `/users/${params.id}`, method: "DELETE", token }),
+    onSuccess: () => {
+      toast.success("Profile deleted successfully!");
+      form.reset({
+        email: "",
+        phone_number: "",
+        first_name: "",
+        last_name: "",
+        date_of_birth: "",
+        gender: "",
+        role: "",
+      });
+      setInitialData(null);
+      setIsEditMode(false);
+    },
     onError: (err: any) => toast.error(err.message || "Failed to delete profile"),
   });
 
   useEffect(() => {
     setIsLoading(true);
+    if (!token || !params.id) {
+      setIsLoading(false);
+      return;
+    }
     fetchUserMutation.mutate();
-  }, );
+  }, [params.id, token]);
 
   const handleCancel = () => {
     if (!initialData) return;
 
     form.setFieldValue("email", initialData.email);
-    form.setFieldValue("phone_number.code", initialData.phone_number.code);
-    form.setFieldValue("phone_number.number", initialData.phone_number.number);
+    form.setFieldValue("phone_number", initialData.phone_number);
     form.setFieldValue("first_name", initialData.first_name);
-    form.setFieldValue("last_name", initialData.last_name);
-    form.setFieldValue("birth_of_birth", initialData.birth_of_birth);
+    form.setFieldValue("last_name", initialData.last_name || "");
+    form.setFieldValue("date_of_birth", initialData.date_of_birth);
     form.setFieldValue("gender", initialData.gender);
-    form.setFieldValue("password", initialData.password);
     form.setFieldValue("role", initialData.role);
 
     setIsEditMode(false);
   };
 
   const handleDelete = async () => {
-    await deleteUsereMutation.mutateAsync();
-    // opsional: redirect atau reset form
+    if (window.confirm("Are you sure you want to delete this profile? This action cannot be undone.")) {
+      await deleteUserMutation.mutateAsync();
+    }
   };
 
-  if (isLoading) {
+  if (isLoading || fetchUserMutation.isPending) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <LoaderCircle className="animate-spin" size={48} />
@@ -170,8 +191,8 @@ export default function UserProfile({ params }: { params: { id: string } }) {
                 validators={{
                   onChangeAsyncDebounceMs: 500,
                   onChangeAsync: async ({ value }) => {
-                    if (!value || !value.code || !value.number) {
-                      return "Full phone number is required";
+                    if (!value) {
+                      return "Phone number is required";
                     }
                     return undefined;
                   },
@@ -179,33 +200,19 @@ export default function UserProfile({ params }: { params: { id: string } }) {
                 children={(field: any) => (
                   <div className="flex flex-col gap-2">
                     <div className="flex flex-row justify-between">
-                      <label htmlFor="phone" className="text-sm font-semibold">
+                      <label htmlFor="phone_number" className="text-sm font-semibold">
                         Phone Number
                       </label>
                       {field.state.meta.isTouched && !field.state.meta.isValid && <em className="text-sm font-semibold text-red-500">{field.state.meta.errors.join(", ")}</em>}
                     </div>
-
-                    <div className="flex gap-2 ">
-                      <select value={field.state.value?.code || ""} onChange={(e) => field.handleChange({ ...field.state.value, code: e.target.value })} disabled={!isEditMode} className="border-2 rounded-lg bg-(--color-surface-1) p-2">
-                        <option value="" disabled selected>
-                          Code
-                        </option>
-                        <option value="+62" selected>
-                          +62
-                        </option>
-                        <option value="+1">+1</option>
-                        <option value="+44">+44</option>
-                      </select>
-
-                      <div className="w-full relative">
-                        <input id="phone" type="tel" placeholder="phone number" value={field.state.value?.number || ""} onChange={(e) => field.handleChange({ ...field.state.value, number: e.target.value })} disabled={!isEditMode} className="w-full border-2 outline-none rounded-lg bg-(--color-surface-1) px-4 py-2 transition-colors duration-150 focus:border-orange-600" />
-                        <Phone className="absolute top-1/2 -translate-y-1/2 right-4" />
-                        {field.getMeta().isValidating && (
-                          <div>
-                            <LoaderCircle className="absolute top-1/2 -translate-y-1/2 right-12 animate-spin" />
-                          </div>
-                        )}
-                      </div>
+                    <div className="relative">
+                      <input id="phone_number" type="tel" placeholder="phone number" value={field.state.value} onChange={(e) => field.handleChange(e.target.value)} disabled={!isEditMode} className="w-full border-2 outline-none rounded-lg bg-(--color-surface-1) px-4 py-2 transition-colors duration-150 ease-in focus:border-orange-600" />
+                      <Phone className="absolute top-1/2 -translate-y-1/2 right-4" />
+                      {field.getMeta().isValidating && (
+                        <div>
+                          <LoaderCircle className="absolute top-1/2 -translate-y-1/2 right-12 animate-spin" />
+                        </div>
+                      )}
                     </div>
                   </div>
                 )}
@@ -231,7 +238,7 @@ export default function UserProfile({ params }: { params: { id: string } }) {
                       {field.state.meta.isTouched && !field.state.meta.isValid && <em className="text-sm font-semibold text-red-500">{field.state.meta.errors.join(", ")}</em>}
                     </div>
                     <div className="relative">
-                      <input id="firstName" type="text" placeholder="first name" value={field.state.value} onChange={(e) => field.handleChange(e.target.value)} disabled={!isEditMode} className="w-full border-2 outline-none rounded-lg bg-(--color-surface-1) px-4 py-2 transition-colors duration-150 focus:border-orange-600" />
+                      <input id="firstName" type="text" placeholder="first name" value={field.state.value} onChange={(e) => field.handleChange(e.target.value)} disabled={!isEditMode} className="w-full border-2 outline-none rounded-lg bg-(--color-surface-1) px-4 py-2 transition-colors duration-150 ease-in focus:border-orange-600" />
                       <UserRoundPen className="absolute top-1/2 -translate-y-1/2 right-4" />
                       {field.getMeta().isValidating && (
                         <div>
@@ -263,7 +270,7 @@ export default function UserProfile({ params }: { params: { id: string } }) {
                       {field.state.meta.isTouched && !field.state.meta.isValid && <em className="text-sm font-semibold text-red-500">{field.state.meta.errors.join(", ")}</em>}
                     </div>
                     <div className="relative">
-                      <input id="lastName" type="text" placeholder="last name" value={field.state.value} onChange={(e) => field.handleChange(e.target.value)} disabled={!isEditMode} className="w-full border-2 outline-none rounded-lg bg-(--color-surface-1) px-4 py-2 transition-colors duration-150 focus:border-orange-600" />
+                      <input id="lastName" type="text" placeholder="last name" value={field.state.value} onChange={(e) => field.handleChange(e.target.value)} disabled={!isEditMode} className="w-full border-2 outline-none rounded-lg bg-(--color-surface-1) px-4 py-2 transition-colors duration-150 ease-in focus:border-orange-600" />
                       <UserRoundPen className="absolute top-1/2 -translate-y-1/2 right-4" />
                       {field.getMeta().isValidating && (
                         <div>
@@ -276,12 +283,12 @@ export default function UserProfile({ params }: { params: { id: string } }) {
               />
 
               <form.Field
-                name="birth_of_birth"
+                name="date_of_birth"
                 validators={{
                   onChangeAsyncDebounceMs: 500,
                   onChangeAsync: async ({ value }) => {
                     if (!value) {
-                      return "Birth date is required";
+                      return "ate of birth is required";
                     }
                     return undefined;
                   },
@@ -295,7 +302,7 @@ export default function UserProfile({ params }: { params: { id: string } }) {
                       {field.state.meta.isTouched && !field.state.meta.isValid && <em className="text-sm font-semibold text-red-500">{field.state.meta.errors.join(", ")}</em>}
                     </div>
                     <div className="relative">
-                      <input id="birthDate" type="date" placeholder="birth date" value={field.state.value} onChange={(e) => field.handleChange(e.target.value)} disabled={!isEditMode} className="w-full border-2 outline-none rounded-lg bg-(--color-surface-1) px-4 py-2 transition-colors duration-150 focus:border-orange-600" />
+                      <input id="birthDate" type="date" placeholder="birth date" value={field.state.value} onChange={(e) => field.handleChange(e.target.value)} disabled={!isEditMode} className="w-full border-2 outline-none rounded-lg bg-(--color-surface-1) px-4 py-2 transition-colors duration-150 ease-in focus:border-orange-600" />
                       <Calendar className="absolute top-1/2 -translate-y-1/2 right-4" />
                       {field.getMeta().isValidating && (
                         <div>
@@ -341,38 +348,6 @@ export default function UserProfile({ params }: { params: { id: string } }) {
               />
 
               <form.Field
-                name="password"
-                validators={{
-                  onChangeAsyncDebounceMs: 500,
-                  onChangeAsync: async ({ value }) => {
-                    if (!value) {
-                      return "Password is required";
-                    }
-                    return undefined;
-                  },
-                }}
-                children={(field: any) => (
-                  <div className="flex flex-col gap-2">
-                    <div className="flex flex-row justify-between">
-                      <label htmlFor="password" className="text-sm font-semibold">
-                        Password
-                      </label>
-                      {field.state.meta.isTouched && !field.state.meta.isValid && <em className="text-sm font-semibold text-red-500">{field.state.meta.errors.join(", ")}</em>}
-                    </div>
-                    <div className="relative">
-                      <input id="password" type="password" placeholder="password" autoComplete="password" value={field.state.value} onChange={(e) => field.handleChange(e.target.value)} disabled={!isEditMode} className="w-full border-2 outline-none rounded-lg bg-(--color-surface-1) px-4 py-2 transition-colors duration-150 focus:border-orange-600" />
-                      <Lock className="absolute top-1/2 -translate-y-1/2 right-4" />
-                      {field.getMeta().isValidating && (
-                        <div>
-                          <LoaderCircle className="absolute top-1/2 -translate-y-1/2 right-12 animate-spin" />
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-              />
-
-              <form.Field
                 name="role"
                 validators={{
                   onChangeAsyncDebounceMs: 500,
@@ -408,19 +383,19 @@ export default function UserProfile({ params }: { params: { id: string } }) {
               <div className="flex gap-4">
                 {isEditMode ? (
                   <>
-                    <button type="submit" className="w-full flex items-center justify-center gap-2 font-semibold rounded-lg bg-gradient-to-r from-green-500 to-green-600 py-2 px-4">
+                    <button type="submit" className="font-semibold w-full flex justify-center items-center gap-2  rounded-lg bg-gradient-to-r from-green-500 to-green-600 py-2 px-4">
                       Save
                     </button>
-                    <button type="button" onClick={handleCancel} className="w-full flex items-center justify-center gap-2 font-semibold rounded-lg bg-gradient-to-r from-gray-500 to-gray-600 py-2 px-4">
+                    <button type="button" onClick={handleCancel} className="font-semibold w-full flex justify-center items-center gap-2 rounded-lg bg-gradient-to-r from-gray-500 to-gray-600 py-2 px-4">
                       Cancel
                     </button>
                   </>
                 ) : (
-                  <button type="button" onClick={() => setIsEditMode(true)} className="w-full flex items-center justify-center gap-2 font-semibold rounded-lg bg-gradient-to-r from-orange-500 to-orange-600 py-2 px-4">
+                  <button type="button" onClick={() => setIsEditMode(true)} className="font-semibold w-full flex justify-center items-center gap-2 rounded-lg bg-gradient-to-r from-orange-500 to-orange-600 py-2 px-4">
                     Edit
                   </button>
                 )}
-                <button type="button" onClick={handleDelete} className="w-full flex items-center justify-center gap-2 font-semibold rounded-lg bg-gradient-to-r from-red-500 to-red-600 py-2 px-4">
+                <button type="button" onClick={handleDelete} className="font-semibold w-full flex justify-center items-center gap-2 rounded-lg bg-gradient-to-r from-red-500 to-red-600 py-2 px-4">
                   Delete
                 </button>
               </div>

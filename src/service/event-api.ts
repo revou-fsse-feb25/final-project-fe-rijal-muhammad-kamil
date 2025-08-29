@@ -17,18 +17,28 @@ export class FetchEvent extends Error {
   }
 }
 
-interface FetchEventOption {
+interface FetchEventOption<T = unknown> {
   endpoint?: string;
+  method?: "GET" | "POST" | "PATCH" | "DELETE";
+  data?: any;
+  params?: Record<string, any>;
+  token?: string;
   timeout?: number;
   cacheControl?: string;
   signal?: AbortSignal;
 }
 
-export async function fetchEvent<T = unknown>({ endpoint = "", timeout = 30000, cacheControl = "no-store", signal }: FetchEventOption): Promise<T> {
+export async function fetchEvent<T = unknown>({ endpoint = "", method = "GET", data, params, token, timeout = 30000, cacheControl = "no-store", signal }: FetchEventOption<T>): Promise<T> {
   const safeEndpoint = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
 
+  const headers: Record<string, string> = { "Cache-Control": cacheControl, "Content-Type": "application/json" };
+  if (token) headers["Authorization"] = `Bearer ${token}`;
   try {
-    const res: AxiosResponse<T> = await api.get<T>(safeEndpoint, {
+    const res: AxiosResponse<T> = await api.request<T>({
+      url: safeEndpoint,
+      method,
+      data,
+      params,
       timeout,
       headers: { "Cache-Control": cacheControl },
       signal,
@@ -38,7 +48,7 @@ export async function fetchEvent<T = unknown>({ endpoint = "", timeout = 30000, 
     if (axios.isAxiosError(err)) {
       const e = err as AxiosError<any>;
       const status = e.response?.status;
-      const serverMsg = e.response?.data?.message ?? e.response?.data?.error ?? (typeof e.response?.data === "string" ? e.response?.data : undefined);
+      const serverMsg = e.response?.data?.message ?? e.response?.data?.error ?? (typeof e.response?.data === "string" ? e.response.data : undefined);
 
       if (e.code === "ERR_CANCELED") throw new FetchEvent("CANCELED_ERROR", "Request was canceled.", status, { cause: err });
       if (e.code === "ECONNABORTED") throw new FetchEvent("TIMEOUT_ERROR", "The request took too long to respond. Please try again.", status, { cause: err });

@@ -22,13 +22,17 @@ interface FetchUserOption {
   method?: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
   data?: any;
   params?: Record<string, any>;
+  token?: string;
   timeout?: number;
   cacheControl?: string;
   signal?: AbortSignal;
 }
 
-export async function fetchUser<T = unknown>({ endpoint = "", method = "GET", data, params, timeout = 30000, cacheControl = "no-store", signal }: FetchUserOption): Promise<T> {
+export async function fetchUser<T = unknown>({ endpoint = "", method = "GET", data, params, token, timeout = 30000, cacheControl = "no-store", signal }: FetchUserOption): Promise<T> {
   const safeEndpoint = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
+
+  const headers: Record<string, string> = { "Cache-Control": cacheControl, "Content-Type": "application/json" };
+  if (token) headers["Authorization"] = `Bearer ${token}`;
 
   try {
     const res: AxiosResponse<T> = await api.request<T>({
@@ -37,7 +41,7 @@ export async function fetchUser<T = unknown>({ endpoint = "", method = "GET", da
       data,
       params,
       timeout,
-      headers: { "Cache-Control": cacheControl },
+      headers,
       signal,
     });
 

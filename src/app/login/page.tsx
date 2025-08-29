@@ -2,13 +2,14 @@
 
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 import { authUser, AuthError } from "@/service/auth.api";
 import { signIn } from "next-auth/react";
-import { useForm } from "@tanstack/react-form";
 import { toast, ToastContainer } from "react-toastify";
-import Image from "next/image";
 import "react-toastify/dist/ReactToastify.css";
-import { LoaderCircle, Mail, MailOpen, Lock, LockOpen } from "lucide-react";
+import { useForm } from "@tanstack/react-form";
+import Image from "next/image";
+import { Mail, MailOpen, LoaderCircle, Lock, LockOpen } from "lucide-react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGoogle, faFacebook, faApple, faTiktok } from "@fortawesome/free-brands-svg-icons";
 
@@ -16,20 +17,34 @@ export default function LoginPage() {
   const [isSuccess, setIsSuccess] = useState(false);
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
+  const router = useRouter();
 
-  const mutation = useMutation({
+  const loginMutation = useMutation({
     mutationFn: ({ email, password }: { email: string; password: string }) => authUser({ email, password }),
     onSuccess: async (data) => {
       const token = data.data.access_token;
       const user = data.data.user;
 
-      await signIn("credentials", {
-        token,
-        user: JSON.stringify(user),
-        redirect: true,
+      const result = await signIn("credentials", {
+        access_token: token,
+        user,
+        redirect: false,
       });
+
       setIsSuccess(true);
-      toast.success(`Selamat datang, ${user.email}!`);
+      toast.success(`Welcome back, ${user.email}!`);
+
+      if (result?.ok) {
+        const { role, user_id } = user;
+        if (role === "ATTENDEE") router.push(`/user-profile/${user_id}`);
+        else if (role === "ORGANIZER") router.push(`/organizer-profile/${user_id}`);
+        else if (role === "ADMIN") router.push(`/admin-profile/${user_id}`);
+        else router.push("/login");
+
+        toast.success(`Welcome back, ${user.email}!`);
+      } else {
+        toast.error(result?.error || "Login failed");
+      }
     },
     onError: (err: any) => {
       if (err instanceof AuthError) {
@@ -50,17 +65,17 @@ export default function LoginPage() {
     onSubmit: ({ value }: any) => {
       setEmailError("");
       setPasswordError("");
-      mutation.mutate({ email: value.email, password: value.password });
+      loginMutation.mutate({ email: value.email, password: value.password });
     },
   });
 
   return (
-    <div className="min-h-100vh">
+    <div className="min-h-screen">
       <ToastContainer />
 
       <div className="min-h-screen grid grid-cols-1 lg:grid-cols-2">
         <div className="flex flex-col justify-center items-center">
-          <div className="relative w-md aspect-[1/1]">
+          <div className="relative w-96 aspect-[1/1]">
             <Image src="/login image.svg" alt="Login image" fill className=" opacity-80" />
           </div>
           <div>
@@ -107,7 +122,7 @@ export default function LoginPage() {
                       {field.state.meta.isTouched && !field.state.meta.isValid && <em className="text-sm font-semibold text-red-500">{field.state.meta.errors.join(", ")}</em>}
                     </div>
                     <div className="relative">
-                      <input id="email" type="email" placeholder="email" autoComplete="email" value={field.value} onChange={(e) => field.handleChange(e.target.value)} className="w-full border-2 outline-none rounded-lg bg-(--color-surface-1) px-4 py-2 transition-colors duration-150 focus:border-orange-600" />
+                      <input id="email" type="email" placeholder="email" autoComplete="email" value={field.value} onChange={(e) => field.handleChange(e.target.value)} className="w-full border-2 outline-none rounded-lg bg-(--color-surface-1) px-4 py-2 transition-colors duration-150 ease-in focus:border-orange-600" />
                       {isSuccess ? <MailOpen className="absolute top-1/2 -translate-y-1/2 right-4" /> : <Mail className="absolute top-1/2 -translate-y-1/2 right-4" />}
                       {field.getMeta().isValidating && (
                         <div>
@@ -140,7 +155,7 @@ export default function LoginPage() {
                       {field.state.meta.isTouched && !field.state.meta.isValid && <em className="text-sm font-semibold text-red-500">{field.state.meta.errors.join(", ")}</em>}
                     </div>
                     <div className="relative">
-                      <input id="password" type="password" placeholder="password" autoComplete="current-password" value={field.value} onChange={(e) => field.handleChange(e.target.value)} className="w-full border-2 outline-none rounded-lg bg-(--color-surface-1) px-4 py-2 transition-colors duration-150 focus:border-orange-600" />
+                      <input id="password" type="password" placeholder="password" autoComplete="current-password" value={field.value} onChange={(e) => field.handleChange(e.target.value)} className="w-full border-2 outline-none rounded-lg bg-(--color-surface-1) px-4 py-2 transition-colors duration-150 ease-in focus:border-orange-600" />
                       {isSuccess ? <LockOpen className="absolute top-1/2 -translate-y-1/2 right-4" /> : <Lock className="absolute top-1/2 -translate-y-1/2 right-4" />}
                       {field.getMeta().isValidating && (
                         <div>
@@ -154,23 +169,19 @@ export default function LoginPage() {
               />
 
               <form.Subscribe
-                selector={(state) => ({
-                  values: state.values as any,
-                  errors: state.errorMap as any,
-                  isSubmitting: state.isSubmitting as any,
-                })}
-              >
-                {({ values, isSubmitting }) => {
-                  const emailMeta = form.getFieldMeta("email");
-                  const passwordMeta = form.getFieldMeta("password");
-                  const isFormValid = emailMeta?.isValid && passwordMeta?.isValid;
-
-                  return (
-                    <button type="submit" disabled={!isFormValid} className="w-full flex items-center justify-center gap-2 font-semibold rounded-lg bg-gradient-to-r from-orange-500 to-orange-600 disabled:opacity-50 disabled:cursor-not-allowed py-2 px-4 transition-opacity duration-200">
-                      {isSubmitting ? <LoaderCircle className="animate-spin" /> : "Masuk"}
-                    </button>
-                  );
+                selector={(state) => {
+                  const emailField = state.fieldMeta.email;
+                  const passwordField = state.fieldMeta.password;
+                  return {
+                    isFormValid: emailField?.isValid == true && passwordField?.isValid == true,
+                  };
                 }}
+              >
+                {({ isFormValid }) => (
+                  <button type="submit" disabled={!isFormValid} className="font-semibold w-full flex justify-center items-center gap-2 rounded-lg bg-gradient-to-r from-orange-500 to-orange-600 disabled:opacity-50 disabled:cursor-not-allowed py-2 px-4 transition-opacity duration-150 ease-in">
+                    {loginMutation.isPending ? <LoaderCircle className="animate-spin" /> : "Masuk"}
+                  </button>
+                )}
               </form.Subscribe>
             </form>
 

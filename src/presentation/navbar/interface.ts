@@ -1,4 +1,4 @@
-interface NavbarDatas {
+export interface NavbarDatas {
   isLink: boolean;
   linkHref?: string;
   linkIcon?: React.ReactNode;

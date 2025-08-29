@@ -1,5 +1,8 @@
 import Navbar from "@/presentation/navbar/navbar";
 import { CalendarPlus2, Compass } from "lucide-react";
+import { useSession } from "next-auth/react";
+import { NavbarDatas } from "@/presentation/navbar/interface";
+import { signOut } from "next-auth/react";
 
 export function HeaderMainNavbar(): React.ReactElement {
   const navbarDatas = [
@@ -18,10 +21,18 @@ export function HeaderMainNavbar(): React.ReactElement {
 }
 
 export function HeaderSecondaryNavbar(): React.ReactElement {
-  const navbarDatas = [
-    { isLink: true, linkHref: "#", linkLabel: "Sign in" },
-    { isLink: true, linkHref: "#", linkLabel: "Sign up" },
+  const { data: session, status } = useSession();
+  let navbarDatas: NavbarDatas[] = [
+    { isLink: true, linkHref: "/login", linkLabel: "Sign in" },
+    { isLink: true, linkHref: "/register", linkLabel: "Sign up" },
   ];
+
+  if (status === "authenticated" && session?.user) {
+    navbarDatas = [
+      { isLink: true, linkHref: "/user-profile", linkLabel: "Profile" },
+      { isLink: false, buttonLabel: "Logout", buttonOnClick: () => signOut({ callbackUrl: "/login" }) },
+    ];
+  }
 
   const navbarStyle = {
     navStyle: "order-first lg:order-last flex justify-end",
