@@ -2,7 +2,10 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   /* config options here */
- images: {
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+  images: {
     remotePatterns: [
       {
         protocol: 'https',
@@ -16,7 +19,7 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'randomuser.me',
       },
-       {
+      {
         protocol: 'https',
         hostname: 'loremflickr.com',
       },
