@@ -175,6 +175,8 @@ src/
 
    Aplikasi akan berjalan di `http://localhost:3002`
 
+   Aplikasi ini sudah dideploy di: [dancing-hotteok-b4a76b.netlify.app](https://dancing-hotteok-b4a76b.netlify.app/)
+
 ## 📜 Available Scripts
 
 ```bash
